@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ficha de Obra - RDO 98</title>
+    <style>
+        :root { --win-grey: #C0C0C0; --win-blue: #000080; --win-white: #FFFFFF; --win-dark: #808080; --win-black: #000000; --win-border-light: #FFFFFF; --win-border-shadow: #404040; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: #55aaaa; font-family: 'Tahoma', 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 10px; }
+        .window { width: 100%; max-width: 750px; background-color: var(--win-grey); border-top: 2px solid var(--win-border-light); border-left: 2px solid var(--win-border-light); border-right: 2px solid var(--win-black); border-bottom: 2px solid var(--win-black); box-shadow: 2px 2px 5px rgba(0,0,0,0.3); display: flex; flex-direction: column; }
+        .title-bar { background: linear-gradient(90deg, var(--win-blue), #1084d0); padding: 3px 5px; display: flex; justify-content: space-between; align-items: center; margin: 3px; }
+        .title-bar-text { color: white; font-weight: bold; font-size: 13px; letter-spacing: 0.5px; display: flex; align-items: center; gap: 5px; }
+        .title-bar-controls { display: flex; gap: 2px; }
+        .title-btn { width: 16px; height: 14px; background-color: var(--win-grey); border-top: 1px solid var(--win-border-light); border-left: 1px solid var(--win-border-light); border-right: 1px solid var(--win-black); border-bottom: 1px solid var(--win-black); font-size: 9px; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; line-height: 1; }
+        .title-btn:active { border-top: 1px solid var(--win-black); border-left: 1px solid var(--win-black); border-right: 1px solid var(--win-border-light); border-bottom: 1px solid var(--win-border-light); }
+        .window-body { padding: 15px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .field-group { display: flex; flex-direction: column; gap: 4px; }
+        label { font-size: 12px; color: #000; }
+        input, select, textarea { background-color: var(--win-white); border-top: 2px solid var(--win-dark); border-left: 2px solid var(--win-dark); border-right: 2px solid var(--win-border-light); border-bottom: 2px solid var(--win-border-light); padding: 4px; font-family: 'Tahoma', sans-serif; font-size: 13px; width: 100%; outline: none; border-radius: 0; }
+        input:read-only, textarea:read-only { background-color: var(--win-grey); color: #444; }
+        input:focus, select:focus, textarea:focus { background-color: #fff; }
+        #Status { font-weight: bold; color: blue; }
+        .btn-win { background-color: var(--win-grey); border-top: 2px solid var(--win-border-light); border-left: 2px solid var(--win-border-light); border-right: 2px solid var(--win-black); border-bottom: 2px solid var(--win-black); padding: 8px 20px; font-size: 13px; color: #000; cursor: pointer; text-align: center; width: 100%; font-weight: bold; margin-top: 10px; }
+        .btn-win:active { border-top: 2px solid var(--win-black); border-left: 2px solid var(--win-black); border-right: 2px solid var(--win-border-light); border-bottom: 2px solid var(--win-border-light); transform: translate(1px, 1px); }
+        #loader { display: none; text-align: center; padding: 20px; font-weight: bold; }
+        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; gap: 10px; } .window { height: 100%; max-width: 100%; } }
+    </style>
+</head>
+<body>
+
+    <div class="window">
+        <div class="title-bar">
+            <div class="title-bar-text"><img src="logo-tel.png" height="12" style="margin-right:5px; filter: brightness(200%);"> PAINEL DE APONTAMENTO - RDO</div>
+            <div class="title-bar-controls">
+                <div class="title-btn" onclick="window.location.href='index.html'">_</div>
+                <div class="title-btn" onclick="window.location.href='index.html'">X</div>
+            </div>
+        </div>
+
+        <div class="window-body">
+            <div id="loader">⏳ Buscando registros no servidor...</div>
+            <div id="formContent" style="display:none;">
+                <form id="formRDO">
+                    <input type="hidden" id="rowIndex" name="rowIndex">
+                    <input type="hidden" id="BA_OS_HIDDEN" name="BA_OS">
+                    <div class="form-grid">
+                        <div class="field-group"><label>BA / PROTOCOLO</label><input type="text" id="BA_OS" readonly style="font-weight:bold; color:#000080;"></div>
+                        <div class="field-group"><label>DATA DE ABERTURA</label><input type="text" id="Data" readonly></div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="field-group"><label>NÚMERO DA OBRA</label><input type="text" id="Obra" readonly></div>
+                        <div class="field-group"><label>STATUS ATUAL</label>
+                            <select id="Status" name="Status">
+                                <option value="PENDENTE">PENDENTE</option><option value="EM TRATAMENTO">EM TRATAMENTO</option><option value="RESOLVIDO">RESOLVIDO</option><option value="CONCLUÍDO">BAIXADO (CONCLUÍDO)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="field-group"><label>TIPO DE SERVIÇO (Desc.)</label><input type="text" id="Atividade" readonly></div>
+                        <div class="field-group"><label>LOCALIDADE / SITE</label><input type="text" id="Local" readonly></div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="field-group"><label>TÉCNICO RESPONSÁVEL</label><input type="text" id="Tecnico" readonly></div>
+                        <div class="field-group"><label>SUPERVISÃO</label><input type="text" id="Supervisao" readonly></div>
+                    </div>
+                    <hr style="border:0; border-top: 1px solid #808080; border-bottom: 1px solid #fff; margin: 10px 0;">
+                    <div class="field-group"><label>HISTÓRICO DA OBRA (Apenas Leitura)</label><textarea id="Descricao" rows="3" readonly style="background:#e0e0e0;"></textarea></div>
+                    <div class="field-group" style="margin-top:10px;"><label>NOVA OBSERVAÇÃO / MOTIVO (Escreva aqui)</label><textarea id="ObsNova" rows="3" placeholder="Digite aqui a atualização para o histórico..."></textarea></div>
+                    <div style="margin-top: 15px; text-align: right;"><button type="button" class="btn-win" onclick="atualizarStatus()">REGISTRAR NA PLANILHA</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // LINK ATUALIZADO AQUI
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwf6l8cDoqJLPJ6wmjE8v87ApzGhnykNAvkjDA0QsN3pl8FlkibuoRoB5kazFnJcmWPwQ/exec'; 
+
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const ba = urlParams.get('ba');
+            if (ba) { buscarDadosDaObra(ba); } else { document.getElementById('loader').style.display = 'block'; document.getElementById('loader').innerHTML = '<p style="color:red">Erro: Nenhum BA selecionado.</p><button class="btn-win" onclick="window.history.back()">Voltar</button>'; }
+        }
+        function buscarDadosDaObra(ba) {
+            document.getElementById('loader').style.display = 'block'; document.getElementById('formContent').style.display = 'none';
+            fetch(SCRIPT_URL + "?acao=buscar_obra&ba=" + ba).then(response => response.json()).then(data => {
+                document.getElementById('loader').style.display = 'none';
+                if(data.encontrado) {
+                    const d = data.dados;
+                    document.getElementById('Data').value = d.Data || ''; document.getElementById('Obra').value = d.Obra || '';
+                    document.getElementById('BA_OS').value = d.BA_OS || ''; document.getElementById('BA_OS_HIDDEN').value = d.BA_OS || '';
+                    document.getElementById('Supervisao').value = d.Supervisao || ''; document.getElementById('Tecnico').value = d.Tecnico || '';
+                    document.getElementById('Descricao').value = d.Descricao || ''; document.getElementById('Local').value = d.Local || '';
+                    document.getElementById('Atividade').value = "Manutenção / Obra"; document.getElementById('Status').value = d.Status || 'PENDENTE'; 
+                    document.getElementById('rowIndex').value = d.rowIndex; document.getElementById('formContent').style.display = 'block';
+                } else { document.getElementById('loader').innerHTML = '<p>❌ Obra não encontrada.</p><button class="btn-win" onclick="window.history.back()">Voltar</button>'; }
+            }).catch(error => { document.getElementById('loader').innerHTML = '<p>⚠️ Erro de conexão.</p>'; });
+        }
+        function atualizarStatus() {
+            const novoStatus = document.getElementById('Status').value; const rowIndex = document.getElementById('rowIndex').value; const obsTexto = document.getElementById('ObsNova').value;
+            if(!rowIndex) return alert('Erro: ID da linha não carregado.');
+            const btn = document.querySelector('.btn-win'); const textoOriginal = btn.innerText; btn.innerText = "SALVANDO..."; btn.disabled = true;
+            const urlUpdate = SCRIPT_URL + "?acao=atualizar_status&rowIndex=" + rowIndex + "&novoStatus=" + novoStatus + "&obs=" + encodeURIComponent(obsTexto);
+            fetch(urlUpdate).then(response => response.json()).then(data => {
+                if(data.sucesso) { alert("✅ Registro salvo com sucesso!"); window.location.href = "index.html"; } 
+                else { alert('❌ Erro: ' + data.msg); btn.innerText = textoOriginal; btn.disabled = false; }
+            }).catch(e => { alert("❌ Erro de comunicação."); btn.innerText = textoOriginal; btn.disabled = false; });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Material V-Tal - SID 98</title>
+    <style>
+        :root { --win-grey: #C0C0C0; --win-blue: #000080; --win-white: #FFFFFF; --win-dark: #808080; --win-black: #000000; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: #55aaaa; font-family: 'Tahoma', 'Segoe UI', sans-serif; padding: 10px; min-height: 100vh; }
+        .window { background-color: var(--win-grey); border-top: 2px solid #fff; border-left: 2px solid #fff; border-right: 2px solid #000; border-bottom: 2px solid #000; max-width: 800px; margin: 0 auto; box-shadow: 5px 5px 15px rgba(0,0,0,0.3); }
+        .title-bar { background: linear-gradient(90deg, var(--win-blue), #1084d0); padding: 3px 5px; display: flex; justify-content: space-between; align-items: center; margin: 3px; }
+        .title-text { color: white; font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 5px; }
+        .title-controls { display: flex; gap: 2px; }
+        .btn-win-ctrl { width: 16px; height: 14px; background: var(--win-grey); border-top: 1px solid #fff; border-left: 1px solid #fff; border-right: 1px solid #000; border-bottom: 1px solid #000; font-size: 9px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .menu-bar { display: flex; gap: 10px; padding: 2px 10px; border-bottom: 1px solid #808080; margin-bottom: 10px; }
+        .menu-opt { font-size: 13px; cursor: pointer; } .menu-opt:hover { background-color: var(--win-blue); color: white; }
+        .window-body { padding: 15px; }
+        fieldset { border: 2px groove #fff; padding: 10px; margin-bottom: 15px; } legend { font-size: 12px; margin-left: 10px; padding: 0 5px; color: #000; }
+        .row { display: flex; gap: 15px; margin-bottom: 10px; } .col { flex: 1; } label { display: block; font-size: 12px; margin-bottom: 3px; }
+        input, select { width: 100%; background-color: #fff; border-top: 2px solid #808080; border-left: 2px solid #808080; border-right: 2px solid #fff; border-bottom: 2px solid #fff; padding: 3px; font-size: 13px; font-family: 'Tahoma', sans-serif; border-radius: 0; outline: none; }
+        .money-input { background-color: #000; color: #0f0; border: 2px inset #fff; font-family: 'Courier New', monospace; font-weight: bold; text-align: right; }
+        .total-input { background-color: #000; color: #FFD700; border: 2px inset #fff; font-family: 'Courier New', monospace; font-weight: bold; text-align: right; font-size: 14px; }
+        .btn-main { padding: 8px 20px; background: var(--win-grey); border-top: 2px solid #fff; border-left: 2px solid #fff; border-right: 2px solid #000; border-bottom: 2px solid #000; font-weight: bold; font-size: 13px; cursor: pointer; width: 100%; }
+        .btn-main:active { border-top: 2px solid #000; border-left: 2px solid #000; border-right: 2px solid #fff; border-bottom: 2px solid #fff; transform: translate(1px, 1px); }
+        @media (max-width: 600px) { .row { flex-direction: column; gap: 5px; } }
+    </style>
+</head>
+<body>
+    <div class="window">
+        <div class="title-bar">
+            <div class="title-text"><img src="logo-vtal.jpg" height="12" style="border: 1px solid white;"> Controle de Material V-Tal</div>
+            <div class="title-controls"><div class="btn-win-ctrl" onclick="window.location.href='index.html'">_</div><div class="btn-win-ctrl" onclick="window.location.href='index.html'">X</div></div>
+        </div>
+        <div class="menu-bar"><div class="menu-opt" onclick="window.location.href='index.html'"><u>A</u>rquivo</div><div class="menu-opt"><u>R</u>elatórios</div><div class="menu-opt"><u>A</u>juda</div></div>
+        <div class="window-body">
+            <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted) {finalizarEnvio();}"></iframe>
+            <form id="formVtal" action="https://script.google.com/macros/s/AKfycbwf6l8cDoqJLPJ6wmjE8v87ApzGhnykNAvkjDA0QsN3pl8FlkibuoRoB5kazFnJcmWPwQ/exec" method="post" target="hidden_iframe" onsubmit="submitted=true; iniciarEnvio();">
+                <input type="hidden" name="AbaDestino" value="MATERIAL_VTAL">
+                <fieldset><legend>Identificação da Ocorrência</legend><div class="row"><div class="col"><label>Data</label><input type="text" id="dataAtual" name="Data" readonly style="background:#e0e0e0"></div><div class="col" style="flex:2"><label>TT (Trouble Ticket)</label><input type="text" name="TT" required autofocus></div><div class="col"><label>ID Técnico</label><input type="text" name="ID"></div></div></fieldset>
+                <fieldset><legend>Responsabilidade</legend><div class="row"><div class="col"><label>Técnico Responsável</label><input type="text" name="Tecnico"></div></div><div class="row"><div class="col"><label>Coordenação</label><input type="text" name="Coordenacao"></div><div class="col"><label>Supervisão</label><input type="text" name="Supervisao"></div></div></fieldset>
+                <fieldset><legend>Detalhes do Material</legend><div class="row"><div class="col" style="flex: 0.5"><label>Cód. SAP</label><input type="text" name="Cod_Material"></div><div class="col" style="flex: 2"><label>Descrição do Item</label><input type="text" name="Descricao"></div></div></fieldset>
+                <fieldset style="border-color: #808080;"><legend style="color: blue; font-weight:bold;">Controle de Valores</legend><div class="row"><div class="col"><label>Valor Unit. (R$)</label><input type="number" step="0.01" id="valUnit" class="money-input" placeholder="0.00" name="Valor_Unit" oninput="calcularTotal()"></div><div class="col"><label>Saldo (Qtd)</label><input type="number" id="saldo" class="money-input" placeholder="0" name="Saldo" oninput="calcularTotal()"></div><div class="col"><label>TOTAL (R$)</label><input type="text" id="valTotal" class="total-input" placeholder="R$ 0,00" name="Valor_Total" readonly></div></div></fieldset>
+                <div style="margin-top: 20px; text-align: right;"><button type="submit" class="btn-main">Registrar Movimentação</button></div>
+            </form>
+        </div>
+        <div style="border-top: 1px solid #808080; padding: 3px; font-size: 11px; color: #444; margin-top: 5px;">Módulo de Estoque v1.0 - Aguardando entrada...</div>
+    </div>
+    <script>
+        var submitted = false;
+        window.onload = function() { var hoje = new Date(); document.getElementById('dataAtual').value = hoje.toLocaleDateString('pt-BR'); }
+        function calcularTotal() { var unitario = parseFloat(document.getElementById('valUnit').value) || 0; var quantidade = parseFloat(document.getElementById('saldo').value) || 0; var total = unitario * quantidade; document.getElementById('valTotal').value = total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
+        function iniciarEnvio() { var btn = document.querySelector('.btn-main'); btn.disabled = true; btn.innerHTML = "Processando..."; document.body.style.cursor = 'wait'; }
+        function finalizarEnvio() { alert("Sistema V-Tal:\n\nMovimentação registrada com sucesso!"); window.location.href = "index.html"; }
+    </script>
+</body>
+</html>
