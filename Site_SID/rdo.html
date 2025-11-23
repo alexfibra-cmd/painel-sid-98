@@ -26,9 +26,12 @@
         .btn-win:active { border-top: 2px solid var(--win-black); border-left: 2px solid var(--win-black); border-right: 2px solid var(--win-border-light); border-bottom: 2px solid var(--win-border-light); transform: translate(1px, 1px); }
         #loader { display: none; text-align: center; padding: 20px; font-weight: bold; }
         
-        /* Campo Extra Oculto por padrão */
-        #boxComplemento { display: none; background: #ffffcc; padding: 5px; border: 1px dotted #808080; }
-        
+        /* ESTILOS ESPECÍFICOS PARA A SEPARAÇÃO DE LISTAS */
+        .radio-group { display: flex; gap: 20px; margin-bottom: 10px; padding: 10px; border: 2px groove #fff; background: #d4d0c8; }
+        .radio-option { display: flex; align-items: center; gap: 5px; font-weight: bold; font-size: 12px; cursor: pointer; }
+        #grupoOperacao, #grupoDoc { display: none; } /* Escondidos por padrão */
+        #boxComplemento { display: none; background: #ffffcc; padding: 5px; border: 1px dotted #808080; margin-top: 5px; }
+
         @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; gap: 10px; } .window { height: 100%; max-width: 100%; } }
     </style>
 </head>
@@ -72,40 +75,52 @@
                     <hr style="border:0; border-top: 1px solid #808080; border-bottom: 1px solid #fff; margin: 10px 0;">
                     <div class="field-group"><label>HISTÓRICO DA OBRA (Apenas Leitura)</label><textarea id="Descricao" rows="3" readonly style="background:#e0e0e0;"></textarea></div>
                     
-                    <div class="form-grid" style="margin-top:10px;">
-                        <div class="field-group">
-                            <label style="color:blue; font-weight:bold;">SELECIONE O TIPO DE TRATATIVA</label>
-                            <select id="Motivo" name="Motivo" onchange="verificarCampoExtra()">
-                                <option value="">-- Selecione uma Opção --</option>
-                                
-                                <optgroup label="1º CASO: TRATAMENTO OPERAÇÃO">
-                                    <option value="SEM MATERIAL GESTECH">SEM MATERIAL GESTECH</option>
-                                    <option value="SEM MATERIAL SGM">SEM MATERIAL SGM</option>
-                                    <option value="ABERTURA DE BA 09">ABERTURA DE BA 09</option>
-                                    <option value="ABERTURA DE DC">ABERTURA DE DC</option>
-                                    <option value="VINCULAR BA 09">VINCULAR BA 09 (Requer Cód. Obra)</option>
-                                    <option value="BA 09 ABERTO">BA 09 ABERTO (Requer Nº BA)</option>
-                                    <option value="DC CRIADA">DC CRIADA (Requer Nº DC)</option>
-                                    <option value="OUTROS_OP">OUTROS (Operação)</option>
-                                </optgroup>
+                    <div style="margin-top: 15px;">
+                        <label style="color:blue; font-weight:bold;">QUAL O TIPO DE APONTAMENTO?</label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="tipoApontamento" value="OP" onchange="alternarListas('OP')"> TRATAMENTO OPERAÇÃO
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="tipoApontamento" value="DOC" onchange="alternarListas('DOC')"> PENDÊNCIA DOCUMENTAÇÃO
+                            </label>
+                        </div>
+                    </div>
 
-                                <optgroup label="3º CASO: PENDÊNCIA OBRA">
-                                    <option value="FALTA APLICAÇAO GESTECH">FALTA APLICAÇÃO GESTECH</option>
-                                    <option value="FALTA APLICAÇAO SGM">FALTA APLICAÇÃO SGM</option>
-                                    <option value="FALTA CROQUI">FALTA CROQUI</option>
-                                    <option value="FALTA EVIDENCIAS">FALTA EVIDÊNCIAS</option>
-                                    <option value="FALTA GASTO NO RDO">FALTA GASTO NO RDO</option>
-                                    <option value="INSERIR TECNICO RDO">INSERIR TÉCNICO RDO</option>
-                                    <option value="EXCLUIR TECNICO RDO">EXCLUIR TÉCNICO RDO</option>
-                                    <option value="OUTROS_OBRA">OUTROS (Obra)</option>
-                                </optgroup>
-                            </select>
-                        </div>
-                        
-                        <div class="field-group" id="boxComplemento">
-                            <label id="lblComplemento" style="color:#D92323; font-weight:bold;">INFORMAÇÃO COMPLEMENTAR:</label>
-                            <input type="text" id="inputExtra" placeholder="Digite o número ou texto aqui...">
-                        </div>
+                    <div class="field-group" id="grupoOperacao">
+                        <label>SELECIONE A OCORRÊNCIA (OPERAÇÃO)</label>
+                        <select id="SelOperacao" onchange="verificarCampoExtra('OP')">
+                            <option value="">-- Selecione --</option>
+                            <option value="SEM MATERIAL GESTECH">SEM MATERIAL GESTECH</option>
+                            <option value="SEM MATERIAL SGM">SEM MATERIAL SGM</option>
+                            <option value="ABERTURA DE BA 09">ABERTURA DE BA 09</option>
+                            <option value="ABERTURA DE DC">ABERTURA DE DC</option>
+                            <option value="VINCULAR BA 09">VINCULAR BA 09 (Requer Cód. Obra)</option>
+                            <option value="BA 09 ABERTO">BA 09 ABERTO (Requer Nº BA)</option>
+                            <option value="DC CRIADA">DC CRIADA (Requer Nº DC)</option>
+                            <option value="DOCUMENTAÇÃO ENTREGUE">DOCUMENTAÇÃO ENTREGUE</option>
+                            <option value="OUTROS">OUTROS (Texto)</option>
+                        </select>
+                    </div>
+
+                    <div class="field-group" id="grupoDoc">
+                        <label>SELECIONE A PENDÊNCIA (DOCUMENTAÇÃO)</label>
+                        <select id="SelDoc" onchange="verificarCampoExtra('DOC')">
+                            <option value="">-- Selecione --</option>
+                            <option value="FALTA APLICAÇAO GESTECH">FALTA APLICAÇÃO GESTECH</option>
+                            <option value="FALTA APLICAÇAO SGM">FALTA APLICAÇÃO SGM</option>
+                            <option value="FALTA CROQUI">FALTA CROQUI</option>
+                            <option value="FALTA EVIDENCIAS">FALTA EVIDÊNCIAS</option>
+                            <option value="FALTA GASTO NO RDO">FALTA GASTO NO RDO</option>
+                            <option value="INSERIR TECNICO RDO">INSERIR TÉCNICO RDO</option>
+                            <option value="EXCLUIR TECNICO RDO">EXCLUIR TÉCNICO RDO</option>
+                            <option value="OUTROS">OUTROS (Texto)</option>
+                        </select>
+                    </div>
+
+                    <div class="field-group" id="boxComplemento">
+                        <label id="lblComplemento" style="color:#D92323; font-weight:bold;">INFORMAÇÃO COMPLEMENTAR:</label>
+                        <input type="text" id="inputExtra" placeholder="Digite o número ou texto aqui...">
                     </div>
 
                     <div class="field-group" style="margin-top:10px;">
@@ -120,7 +135,6 @@
     </div>
 
     <script>
-        // --- LINK ATUALIZADO AQUI ---
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwaZlOsNmSNXDkTW7BHDe8qAThYyWgxejNZtodS2xShmP6s6fAGDe_Y4EWY51cpQVKwaQ/exec'; 
 
         window.onload = function() {
@@ -129,33 +143,51 @@
             if (ba) { buscarDadosDaObra(ba); } else { document.getElementById('loader').style.display = 'block'; document.getElementById('loader').innerHTML = '<p style="color:red">Erro: Nenhum BA selecionado.</p><button class="btn-win" onclick="window.history.back()">Voltar</button>'; }
         }
 
-        // Lógica para mostrar/esconder o campo extra
-        function verificarCampoExtra() {
-            const motivo = document.getElementById('Motivo').value;
+        // Alterna entre as listas com base na bolinha (Radio)
+        function alternarListas(tipo) {
+            document.getElementById('grupoOperacao').style.display = 'none';
+            document.getElementById('grupoDoc').style.display = 'none';
+            document.getElementById('boxComplemento').style.display = 'none';
+            document.getElementById('inputExtra').value = '';
+            
+            // Reseta selects
+            document.getElementById('SelOperacao').value = "";
+            document.getElementById('SelDoc').value = "";
+
+            if (tipo === 'OP') {
+                document.getElementById('grupoOperacao').style.display = 'flex';
+            } else {
+                document.getElementById('grupoDoc').style.display = 'flex';
+            }
+        }
+
+        // Verifica se precisa mostrar o campo amarelo
+        function verificarCampoExtra(tipoOrigem) {
+            let motivo = "";
+            if (tipoOrigem === 'OP') {
+                motivo = document.getElementById('SelOperacao').value;
+            } else {
+                motivo = document.getElementById('SelDoc').value;
+            }
+
             const box = document.getElementById('boxComplemento');
             const lbl = document.getElementById('lblComplemento');
             const input = document.getElementById('inputExtra');
 
-            // Reseta
             box.style.display = 'none';
-            input.value = '';
-
+            
             if (motivo.includes("VINCULAR BA 09")) {
                 lbl.innerText = "INFORME O CÓD. DE OBRA:";
-                box.style.display = 'flex';
-                input.focus();
+                box.style.display = 'flex'; input.focus();
             } else if (motivo.includes("BA 09 ABERTO")) {
                 lbl.innerText = "INFORME O Nº DO BA 09:";
-                box.style.display = 'flex';
-                input.focus();
+                box.style.display = 'flex'; input.focus();
             } else if (motivo.includes("DC CRIADA")) {
                 lbl.innerText = "INFORME O NR DA DC:";
-                box.style.display = 'flex';
-                input.focus();
+                box.style.display = 'flex'; input.focus();
             } else if (motivo.includes("OUTROS")) {
                 lbl.innerText = "DIGITE O MOTIVO/TEXTO:";
-                box.style.display = 'flex';
-                input.focus();
+                box.style.display = 'flex'; input.focus();
             }
         }
 
@@ -179,21 +211,26 @@
             const novoStatus = document.getElementById('Status').value; 
             const rowIndex = document.getElementById('rowIndex').value; 
             
-            // Pega os campos
-            const motivoSel = document.getElementById('Motivo').value;
+            // Descobre qual motivo pegar (O que estiver visível)
+            let motivoFinal = "";
+            if (document.getElementById('grupoOperacao').style.display !== 'none') {
+                motivoFinal = document.getElementById('SelOperacao').value;
+            } else if (document.getElementById('grupoDoc').style.display !== 'none') {
+                motivoFinal = document.getElementById('SelDoc').value;
+            }
+
+            if (!motivoFinal) return alert('⚠️ Por favor, selecione o TIPO DE APONTAMENTO e o MOTIVO.');
+
             const infoExtra = document.getElementById('inputExtra').value;
             const obsAdicional = document.getElementById('ObsNova').value;
 
-            // Monta a observação final (Junta tudo num texto só para salvar)
             let obsFinal = obsAdicional;
-            if (infoExtra) {
-                obsFinal = `[DADO: ${infoExtra}] ` + obsFinal;
-            }
+            if (infoExtra) { obsFinal = `[DADO: ${infoExtra}] ` + obsFinal; }
             
             if(!rowIndex) return alert('Erro: ID da linha não carregado.');
             const btn = document.querySelector('.btn-win'); const textoOriginal = btn.innerText; btn.innerText = "SALVANDO..."; btn.disabled = true;
             
-            const urlUpdate = SCRIPT_URL + "?acao=atualizar_status&rowIndex=" + rowIndex + "&novoStatus=" + novoStatus + "&obs=" + encodeURIComponent(obsFinal) + "&motivo=" + encodeURIComponent(motivoSel);
+            const urlUpdate = SCRIPT_URL + "?acao=atualizar_status&rowIndex=" + rowIndex + "&novoStatus=" + novoStatus + "&obs=" + encodeURIComponent(obsFinal) + "&motivo=" + encodeURIComponent(motivoFinal);
             
             fetch(urlUpdate).then(response => response.json()).then(data => {
                 if(data.sucesso) { alert("✅ Registro salvo com sucesso!"); window.location.href = "index.html"; } 
