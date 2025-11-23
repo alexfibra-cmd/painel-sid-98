@@ -35,7 +35,7 @@
         <div class="menu-bar"><div class="menu-opt" onclick="window.location.href='index.html'"><u>A</u>rquivo</div><div class="menu-opt"><u>R</u>elatórios</div><div class="menu-opt"><u>A</u>juda</div></div>
         <div class="window-body">
             <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted) {finalizarEnvio();}"></iframe>
-            <form id="formVtal" action="https://script.google.com/macros/s/AKfycbwf6l8cDoqJLPJ6wmjE8v87ApzGhnykNAvkjDA0QsN3pl8FlkibuoRoB5kazFnJcmWPwQ/exec" method="post" target="hidden_iframe" onsubmit="submitted=true; iniciarEnvio();">
+            <form id="formVtal" action="https://script.google.com/macros/s/AKfycbwfF9bVzieRqpT83NKvnlS21ioW9SNckTQ7mkkg2afBqV6yWfBXHrvI00XThIPu-hGx5w/exec" method="post" target="hidden_iframe" onsubmit="submitted=true; iniciarEnvio();">
                 <input type="hidden" name="AbaDestino" value="MATERIAL_VTAL">
                 <fieldset><legend>Identificação da Ocorrência</legend><div class="row"><div class="col"><label>Data</label><input type="text" id="dataAtual" name="Data" readonly style="background:#e0e0e0"></div><div class="col" style="flex:2"><label>TT (Trouble Ticket)</label><input type="text" name="TT" required autofocus></div><div class="col"><label>ID Técnico</label><input type="text" name="ID"></div></div></fieldset>
                 <fieldset><legend>Responsabilidade</legend><div class="row"><div class="col"><label>Técnico Responsável</label><input type="text" name="Tecnico"></div></div><div class="row"><div class="col"><label>Coordenação</label><input type="text" name="Coordenacao"></div><div class="col"><label>Supervisão</label><input type="text" name="Supervisao"></div></div></fieldset>
