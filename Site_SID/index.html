@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhe da Obra - SID 98</title>
+    <style>
+        :root { --win-grey: #d4d0c8; --win-blue: #000080; --win-light: #fff; --win-dark: #404040; }
+        * { box-sizing: border-box; font-family: 'Tahoma', sans-serif; font-size: 11px; }
+        body { background: #55aaaa; margin: 0; height: 100vh; padding: 10px; display:flex; justify-content:center; }
+        
+        .window { width: 100%; max-width: 950px; background: var(--win-grey); border: 2px outset #fff; display:flex; flex-direction:column; box-shadow: 5px 5px 15px rgba(0,0,0,0.5); }
+        
+        /* CABEÇALHO FIXO */
+        .header-info { padding: 10px; border-bottom: 1px solid #808080; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; background: #e0e0e0; }
+        .info-box label { font-weight:bold; color: var(--win-blue); display:block; }
+        .info-box input { border:none; background:transparent; font-weight:bold; width:100%; color:#000; }
+
+        /* TABS */
+        .tabs { display: flex; padding: 5px 5px 0 5px; border-bottom: 2px solid #fff; }
+        .tab-btn { 
+            padding: 6px 15px; margin-right: 2px; border: 2px outset #fff; border-bottom: none; 
+            background: var(--win-grey); cursor: pointer; font-weight: bold; border-radius: 3px 3px 0 0;
+        }
+        .tab-btn.active { background: #fff; border-bottom: 2px solid #fff; margin-bottom: -2px; position: relative; z-index: 10; }
+        
+        /* CONTEÚDO DAS ABAS */
+        .tab-content { padding: 15px; background: #fff; border: 2px inset #fff; flex: 1; overflow-y: auto; display: none; }
+        .tab-content.active { display: block; }
+
+        /* ESTILOS COMUNS */
+        fieldset { border: 1px solid #808080; padding: 10px; margin-bottom: 10px; }
+        legend { color: var(--win-blue); font-weight: bold; }
+        input, select, textarea { width: 100%; border: 1px inset #fff; padding: 3px; background: #fff; }
+        .btn-action { padding: 8px 20px; background: var(--win-grey); border: 2px outset #fff; cursor: pointer; font-weight: bold; width: 100%; }
+        .btn-action:active { border-style: inset; }
+        
+        /* TABELA GASTOS */
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #d4d0c8; border: 1px solid #000; text-align:left; padding: 2px; }
+        td { border: 1px solid #eee; padding: 2px; }
+        .tbl-input { border:none; width:100%; }
+
+        #loader { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center; color:#fff; font-size:20px; font-weight:bold; z-index:999; display:none; }
+        #boxComplemento { display: none; background: #ffffcc; padding: 5px; border: 1px dotted red; margin-top:5px; }
+    </style>
+</head>
+<body>
+    <datalist id="listaMateriais"></datalist> <div id="loader">⏳ Carregando...</div>
+
+    <div class="window">
+        <div style="background: linear-gradient(90deg, #000080, #1084d0); padding: 4px; color: white; font-weight: bold; display:flex; justify-content:space-between;">
+            <span>FICHA TÉCNICA INTEGRADA</span>
+            <span style="cursor:pointer" onclick="window.close()">X</span>
+        </div>
+
+        <div class="header-info">
+            <div class="info-box"><label>BA / OS</label><input type="text" id="h_ba" readonly></div>
+            <div class="info-box"><label>OBRA ID</label><input type="text" id="h_obra" readonly></div>
+            <div class="info-box"><label>TÉCNICO</label><input type="text" id="h_tec" readonly></div>
+            <div class="info-box"><label>SUPERVISOR</label><input type="text" id="h_sup" readonly></div>
+            <input type="hidden" id="rowIndex"> 
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn" onclick="abrirAba('rdo')" id="btn-rdo">📁 RDO / STATUS</button>
+            <button class="tab-btn" onclick="abrirAba('vtal')" id="btn-vtal">📦 GASTOS / MATERIAIS</button>
+            <button class="tab-btn" onclick="abrirAba('rede')" id="btn-rede">📡 PROJ. REDE</button>
+        </div>
+
+        <div id="tab-rdo" class="tab-content">
+            <fieldset><legend>Tratativa da Pendência</legend>
+                <label>STATUS ATUAL:</label>
+                <select id="Status">
+                    <option value="PENDENTE">PENDENTE</option>
+                    <option value="EM TRATAMENTO">EM TRATAMENTO</option>
+                    <option value="RESOLVIDO">RESOLVIDO</option>
+                    <option value="CONCLUÍDO">BAIXADO (CONCLUÍDO)</option>
+                </select>
+                
+                <div style="margin-top:10px; border:1px solid #ccc; padding:5px;">
+                    <label style="color:blue; font-weight:bold;">TIPO:</label>
+                    <input type="radio" name="tipoApont" onchange="mudarLista('OP')"> Operação
+                    <input type="radio" name="tipoApont" onchange="mudarLista('DOC')"> Documentação
+                </div>
+
+                <div id="divMotivo" style="margin-top:10px;">
+                    <label>MOTIVO:</label>
+                    <select id="Motivo" onchange="verificarExtra()">
+                        <option value="">-- Selecione o Tipo acima --</option>
+                    </select>
+                </div>
+
+                <div id="boxComplemento">
+                    <label id="lblExtra">INFORMAÇÃO EXTRA:</label>
+                    <input type="text" id="inputExtra">
+                </div>
+
+                <br><label>OBSERVAÇÃO:</label>
+                <textarea id="ObsNova" rows="3"></textarea>
+                <br><br>
+                <button class="btn-action" onclick="salvarRDO()">💾 REGISTRAR STATUS NA PLANILHA</button>
+            </fieldset>
+        </div>
+
+        <div id="tab-vtal" class="tab-content">
+            <fieldset><legend>Lançamento de Gastos (V-Tal/LPU)</legend>
+                <div style="height:250px; overflow-y:scroll; border:1px inset #fff; margin-bottom:10px;">
+                    <table id="tabelaItens">
+                        <thead><tr><th width="15%">CÓD</th><th width="40%">DESCRIÇÃO</th><th width="10%">QTD</th><th width="15%">VALOR</th><th width="5%">X</th></tr></thead>
+                        <tbody id="tbodyItens"></tbody>
+                    </table>
+                </div>
+                <button class="btn-action" style="width:auto; background:#e0e0e0;" onclick="adicionarLinha()">+ ADICIONAR ITEM</button>
+                <div style="float:right; font-weight:bold; font-size:14px;">TOTAL: <span id="totalGeral">R$ 0,00</span></div>
+                <br><br>
+                <button class="btn-action" onclick="salvarGastos()">💾 SALVAR GASTOS NO ESTOQUE</button>
+            </fieldset>
+        </div>
+
+        <div id="tab-rede" class="tab-content">
+            <fieldset><legend>Dados de Engenharia</legend>
+                <label>DC / Sigla:</label><input type="text" id="rede_dc">
+                <br><br>
+                <label>Medição:</label><input type="number" id="rede_medicao">
+                <br><br>
+                <button class="btn-action">💾 SALVAR PROJETO</button>
+            </fieldset>
+        </div>
+    </div>
+
+    <script>
+        // SEU LINK ATUALIZADO
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwH6dek08S8I8dpKXWYZR7flENqCXJPqtX-OlJKd9jMuVBYAR1eC5-y-eJ4RztswNQq/exec';
+        
+        var catalogo = [];
+
+        window.onload = function() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const ba = urlParams.get('ba');
+                const tab = urlParams.get('tab') || 'rdo';
+                
+                abrirAba(tab);
+                carregarBaseMateriais(); // Carrega lista
+
+                if (ba) {
+                    carregarObra(ba);
+                } else {
+                    // Se não tiver BA, não trava a tela, apenas avisa
+                    console.log("Modo sem BA");
+                    document.getElementById('loader').style.display = 'none';
+                }
+            } catch(e) {
+                alert("Erro ao iniciar: " + e);
+                document.getElementById('loader').style.display = 'none';
+            }
+        }
+
+        function abrirAba(aba) {
+            document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
+            
+            var elTab = document.getElementById('tab-' + aba);
+            var elBtn = document.getElementById('btn-' + aba);
+            
+            if(elTab) elTab.classList.add('active');
+            if(elBtn) elBtn.classList.add('active');
+        }
+
+        // --- INTEGRAÇÃO RDO ---
+        function carregarObra(ba) {
+            document.getElementById('loader').style.display = 'flex';
+            window.receberDados = function(res) {
+                document.getElementById('loader').style.display = 'none';
+                if(res.encontrado) {
+                    var d = res.dados;
+                    document.getElementById('h_ba').value = d.BA_OS;
+                    document.getElementById('h_obra').value = d.Obra;
+                    document.getElementById('h_tec').value = d.Tecnico;
+                    document.getElementById('h_sup').value = d.Supervisao;
+                    document.getElementById('rowIndex').value = d.rowIndex;
+                    document.getElementById('Status').value = d.Status;
+                } else { 
+                    alert("Obra não encontrada."); 
+                    window.location.href = "index.html"; 
+                }
+            }
+            var s = document.createElement('script');
+            s.src = SCRIPT_URL + "?acao=buscar_obra&ba=" + ba + "&callback=receberDados";
+            document.body.appendChild(s);
+        }
+
+        function mudarLista(tipo) {
+            var sel = document.getElementById('Motivo');
+            sel.innerHTML = "<option value=''>-- Selecione --</option>";
+            
+            var ops = [];
+            if(tipo === 'OP') {
+               ops = ["SEM MATERIAL GESTECH", "SEM MATERIAL SGM", "ABERTURA DE BA 09", "ABERTURA DE DC", "VINCULAR BA 09", "BA 09 ABERTO", "DC CRIADA", "DOCUMENTAÇÃO ENTREGUE", "OUTROS"];
+            } else {
+               ops = ["FALTA APLICAÇAO GESTECH", "FALTA APLICAÇAO SGM", "FALTA CROQUI", "FALTA EVIDENCIAS", "FALTA GASTO NO RDO", "INSERIR TECNICO RDO", "EXCLUIR TECNICO RDO", "OUTROS"];
+            }
+            
+            ops.forEach(o => { sel.innerHTML += `<option value="${o}">${o}</option>`; });
+        }
+
+        function verificarExtra() {
+            var m = document.getElementById('Motivo').value;
+            var box = document.getElementById('boxComplemento');
+            var lbl = document.getElementById('lblExtra');
+            
+            box.style.display = 'none';
+            
+            if (m.includes("VINCULAR") || m.includes("ABERTO") || m.includes("CRIADA") || m.includes("OUTROS")) {
+                lbl.innerText = "DIGITE O NÚMERO/TEXTO:";
+                box.style.display = 'block';
+            }
+        }
+
+        function salvarRDO() {
+            var row = document.getElementById('rowIndex').value;
+            var st = document.getElementById('Status').value;
+            var mot = document.getElementById('Motivo').value;
+            var obs = document.getElementById('ObsNova').value;
+            var ext = document.getElementById('inputExtra').value;
+            if(ext) obs = `[DADO: ${ext}] ` + obs;
+
+            if(!mot) return alert("Selecione um motivo.");
+            
+            document.getElementById('loader').style.display = 'flex';
+            
+            window.retornoSalvarRDO = function(res) {
+                document.getElementById('loader').style.display = 'none';
+                if(res.sucesso) alert("✅ Atualizado!");
+                else alert("Erro ao salvar.");
+            }
+            var s = document.createElement('script');
+            s.src = SCRIPT_URL + `?acao=atualizar_status&rowIndex=${row}&novoStatus=${st}&motivo=${encodeURIComponent(mot)}&obs=${encodeURIComponent(obs)}&callback=retornoSalvarRDO`;
+            document.head.appendChild(s);
+        }
+
+        // --- INTEGRAÇÃO MATERIAIS (TABELA) ---
+        function carregarBaseMateriais() {
+            window.receberBase = function(data) {
+                catalogo = data;
+                var opts = "";
+                // Cria o datalist para autocomplete
+                data.forEach(item => { opts += `<option value="${item.desc} | Cód: ${item.codigo}">R$ ${item.valor}</option>`; });
+                document.getElementById('listaMateriais').innerHTML = opts;
+            }
+            var s = document.createElement('script');
+            s.src = SCRIPT_URL + "?acao=listar_materiais&callback=receberBase";
+            document.body.appendChild(s);
+        }
+
+        function adicionarLinha() {
+            var tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="text" class="tbl-input cod" readonly style="width:100%"></td>
+                <td><input type="text" class="tbl-input desc" list="listaMateriais" onchange="preencherItem(this)" placeholder="Buscar..." style="width:100%"></td>
+                <td><input type="number" class="tbl-input qtd" oninput="calcLinha(this)" style="width:100%"></td>
+                <td><input type="text" class="tbl-input val" readonly style="width:100%"></td>
+                <td style="color:red; cursor:pointer; text-align:center;" onclick="this.parentElement.remove()">X</td>
+            `;
+            document.getElementById('tbodyItens').appendChild(tr);
+        }
+
+        function preencherItem(input) {
+            if(!input.value.includes('|')) return;
+            var cod = input.value.split(' | Cód: ')[1];
+            var item = catalogo.find(x => x.codigo == cod);
+            if(item) {
+                var tr = input.parentElement.parentElement;
+                tr.querySelector('.cod').value = item.codigo;
+                tr.querySelector('.val').value = item.valor;
+                tr.dataset.origem = item.origem; // Guarda se é VTAL ou LPU
+            }
+        }
+
+        function calcLinha(input) { /* Lógica futura de total */ }
+
+        function salvarGastos() {
+            var itens = [];
+            document.querySelectorAll('#tbodyItens tr').forEach(tr => {
+                var c = tr.querySelector('.cod').value;
+                if(c) itens.push({
+                    ba: document.getElementById('h_ba').value,
+                    tecnico: document.getElementById('h_tec').value,
+                    supervisor: document.getElementById('h_sup').value,
+                    codigo: c,
+                    desc: tr.querySelector('.desc').value.split('|')[0],
+                    qtd: tr.querySelector('.qtd').value,
+                    valorUnit: tr.querySelector('.val').value,
+                    valorTotal: 0, 
+                    origem: tr.dataset.origem
+                });
+            });
+
+            if(itens.length==0) return alert("Lista vazia.");
+            
+            document.getElementById('loader').style.display = 'flex';
+
+            window.retornoGastos = function(res) { 
+                document.getElementById('loader').style.display = 'none';
+                alert(res.sucesso ? "✅ Gastos Salvos!" : "Erro: " + res.msg); 
+            }
+            
+            var json = JSON.stringify(itens);
+            var s = document.createElement('script');
+            s.src = SCRIPT_URL + "?acao=salvar_gastos&dadosJSON=" + encodeURIComponent(json) + "&callback=retornoGastos";
+            document.head.appendChild(s);
+        }
+    </script>
+</body>
+</html>
