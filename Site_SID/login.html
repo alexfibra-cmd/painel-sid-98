@@ -3,177 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login de Rede - SID</title>
+    <title>Acesso - SID 98</title>
     <style>
-        :root {
-            --win-grey: #C0C0C0;
-            --win-blue: #000080;
-            --win-white: #FFFFFF;
-            --win-dark: #808080;
-            --win-black: #000000;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tahoma', sans-serif; }
-
-        body {
-            background-color: #55aaaa; /* Cor Clássica do Desktop */
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
-
-        .window {
-            width: 380px;
-            background-color: var(--win-grey);
-            border-top: 2px solid #fff;
-            border-left: 2px solid #fff;
-            border-right: 2px solid #000;
-            border-bottom: 2px solid #000;
-            box-shadow: 4px 4px 10px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: column;
-            padding: 3px;
-        }
-
-        .title-bar {
-            background: linear-gradient(90deg, var(--win-blue), #1084d0);
-            padding: 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 5px;
-        }
-
-        .title-text {
-            color: white;
-            font-weight: bold;
-            font-size: 13px;
-            margin-left: 2px;
-        }
-
-        .btn-close {
-            width: 16px; height: 14px;
-            background: var(--win-grey);
-            border-top: 1px solid #fff; border-left: 1px solid #fff;
-            border-right: 1px solid #000; border-bottom: 1px solid #000;
-            font-size: 9px; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; font-weight: bold;
-        }
-
-        .content {
-            padding: 15px;
-            display: flex;
-            gap: 15px;
-            align-items: flex-start;
-        }
-
-        .icon-area img {
-            width: 48px; /* Tamanho de ícone clássico */
-            height: auto;
-        }
-
-        .form-area {
-            flex: 1;
-        }
-
-        .input-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            font-size: 12px;
-            margin-bottom: 3px;
-        }
-
-        input {
-            width: 100%;
-            border-top: 2px solid #808080; border-left: 2px solid #808080;
-            border-right: 2px solid #fff; border-bottom: 2px solid #fff;
-            padding: 4px;
-            font-size: 13px;
-            outline: none;
-        }
-
-        .actions {
-            display: flex;
-            justify-content: flex-end; /* Botões à direita */
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        button {
-            min-width: 75px;
-            padding: 5px 10px;
-            background: var(--win-grey);
-            border-top: 2px solid #fff; border-left: 2px solid #fff;
-            border-right: 2px solid #000; border-bottom: 2px solid #000;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        button:active {
-            border-top: 2px solid #000; border-left: 2px solid #000;
-            border-right: 2px solid #fff; border-bottom: 2px solid #fff;
-            transform: translate(1px, 1px);
-        }
-
-        /* Borda pontilhada de foco no botão */
-        button:focus {
-            outline: 1px dotted #000;
-            outline-offset: -4px;
-        }
+        :root { --sid-red: #D92323; --input-bg: #1a1a1a; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Arial, sans-serif; }
+        body { height: 100vh; display: flex; justify-content: center; align-items: center; background-color: #d4d4d4; }
+        .login-panel { width: 100%; max-width: 420px; padding: 40px; background: #e0e0e0; border: 2px outset #fff; box-shadow: 10px 10px 0 rgba(0,0,0,0.5); text-align: center; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; font-weight: bold; margin-bottom: 5px; }
+        .input-field { width: 100%; padding: 10px; border: 2px inset #fff; }
+        .btn-submit { width: 100%; padding: 10px; background: var(--sid-red); color: white; font-weight: bold; cursor: pointer; border: 2px outset #fff; }
+        .btn-submit:active { border-style: inset; }
     </style>
 </head>
 <body>
-
-    <div class="window">
-        <div class="title-bar">
-            <div class="title-text">Bem-vindo ao SID</div>
-            <div class="btn-close">X</div>
+    <div class="login-panel">
+        <img src="logo-sid.jpg" alt="SID" style="height:50px; margin-bottom:20px;">
+        
+        <div class="input-group">
+            <label>SEU NOME (Quem está acessando?)</label>
+            <input type="text" id="nome_usuario" class="input-field" placeholder="Ex: João Silva" autofocus>
         </div>
-
-        <div class="content">
-            <div class="icon-area">
-                <img src="logo-sid.jpg" style="border: 2px inset #fff;">
-            </div>
-            
-            <div class="form-area">
-                <p style="font-size:12px; margin-bottom:15px;">Digite um nome de usuário e senha para efetuar o logon no sistema.</p>
-                
-                <div class="input-group">
-                    <label><u>N</u>ome de usuário:</label>
-                    <input type="text" value="ADMIN" readonly style="background:#ddd; color:#555;">
-                </div>
-                
-                <div class="input-group">
-                    <label><u>S</u>enha:</label>
-                    <input type="password" id="pass" autofocus onkeydown="if(event.key==='Enter') fazerLogin()">
-                </div>
-            </div>
+        
+        <div class="input-group">
+            <label>SENHA DE ACESSO</label>
+            <input type="password" id="pass" class="input-field">
         </div>
-
-        <div class="actions" style="padding: 0 15px 15px 15px;">
-            <button onclick="fazerLogin()" style="font-weight:bold; border: 2px solid #000; border-top-color:#fff; border-left-color:#fff;">OK</button>
-            <button onclick="document.getElementById('pass').value=''">Cancelar</button>
-        </div>
+        
+        <button type="button" class="btn-submit" onclick="fazerLogin()">ENTRAR NO SISTEMA</button>
     </div>
 
     <script>
-        sessionStorage.clear();
+        sessionStorage.clear(); // Limpa sessão anterior ao abrir
+        
         function fazerLogin() {
+            var nome = document.getElementById('nome_usuario').value;
             var senha = document.getElementById('pass').value;
-            // Senha simples mantida do seu código original
+            
+            if (nome.trim() === "") {
+                alert("⚠️ ERRO: Você precisa digitar seu nome para registrar o acesso.");
+                return;
+            }
+
             if (senha === "1234") {
+                // Salva o nome para usar nos formulários
                 sessionStorage.setItem("token_acesso", "autorizado");
-                document.body.style.cursor = "wait"; // Ampulheta
-                setTimeout(function() { window.location.href = "index.html"; }, 500);
+                sessionStorage.setItem("usuario_logado", nome.toUpperCase()); 
+                
+                window.location.href = "index.html";
             } else {
-                alert("Senha incorreta.\nTente novamente.");
-                document.getElementById('pass').value = "";
-                document.getElementById('pass').focus();
+                alert("Senha incorreta.");
             }
         }
     </script>
