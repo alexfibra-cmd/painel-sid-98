@@ -14,10 +14,8 @@
         /* CABEÇALHO FIXO */
         .header-info { padding: 10px; border-bottom: 1px solid #808080; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; background: #e0e0e0; }
         .info-box label { font-weight:bold; color: var(--win-blue); display:block; }
-        
-        /* CAMPO BA LIBERADO */
+        /* Campo BA liberado */
         #h_ba { border: 2px inset #fff; background: #fff; font-weight:bold; width:100%; color:#000; cursor: text; }
-        /* Outros campos travados */
         .info-box input[readonly] { border:none; background:transparent; font-weight:bold; width:100%; color:#000; }
 
         /* TABS */
@@ -134,8 +132,8 @@
     </div>
 
     <script>
-        // SEU LINK DO SCRIPT
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwH6dek08S8I8dpKXWYZR7flENqCXJPqtX-OlJKd9jMuVBYAR1eC5-y-eJ4RztswNQq/exec';
+        // SEU LINK ATUAL
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxL4IoQKP2bxvfL921CZ5xwad3Ic34NowAxogE9BgUD7HdCYrHf7Mat1vluJP1Pmup2ig/exec'; 
         
         var catalogo = [];
 
@@ -152,17 +150,11 @@
                     document.getElementById('h_ba').value = ba;
                     carregarObra(ba);
                 } else {
-                    // MODO BUSCA MANUAL:
-                    // 1. Esconde o Loader para não travar a tela
                     document.getElementById('loader').style.display = 'none';
-                    // 2. Tenta perguntar (prompt)
                     var novo = prompt("Digite o NÚMERO DO BA para acessar:");
                     if(novo) {
                         document.getElementById('h_ba').value = novo;
                         carregarObra(novo);
-                    } else {
-                        // 3. Se cancelar, foca no campo para a pessoa digitar quando quiser
-                        document.getElementById('h_ba').focus();
                     }
                 }
             } catch(e) {
