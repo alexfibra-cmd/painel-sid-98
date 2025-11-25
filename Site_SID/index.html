@@ -116,7 +116,7 @@
         <div id="view-rdo" class="view-container">
             <div class="action-bar">
                 <h4 style="margin:0">📂 Gestão RDO</h4>
-                <a href="https://script.google.com/macros/s/AKfycbwH6dek08S8I8dpKXWYZR7flENqCXJPqtX-OlJKd9jMuVBYAR1eC5-y-eJ4RztswNQq/exec" class="btn-action" target="_blank">Novo Registro...</a>
+                <a href="detalhe_obra.html?tab=rdo" class="btn-action" target="_blank">Novo Registro...</a>
             </div>
             <iframe class="data-frame" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRzdODCT5YQzTD8ZLmQypye1-KhJ8foO5bYJAD2KWal8HC6rid6N93s4XAXL8sG7zDUS2SNeyzfPzGY/pubhtml?gid=2085139649&single=true"></iframe>
         </div>
@@ -137,7 +137,7 @@
     </main>
 
     <script>
-        // --- LINK NOVO E CORRETO AQUI TAMBÉM ---
+        // --- LINK CORRIGIDO DEFINITIVAMENTE AQUI ---
         const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbwH6dek08S8I8dpKXWYZR7flENqCXJPqtX-OlJKd9jMuVBYAR1eC5-y-eJ4RztswNQq/exec";
 
         function showView(viewName) {
@@ -153,7 +153,6 @@
         }
         function toggleMenu() { if (window.innerWidth <= 768) { document.getElementById('sidebar').classList.toggle('active'); } }
         
-        // --- FUNÇÃO JSONP (Correção CORS) ---
         function carregarKPIs() {
             window.handleKPIs = function(data) {
                 document.getElementById('kpi-total').innerText = data.total;
@@ -166,8 +165,8 @@
             document.head.appendChild(script);
 
             script.onerror = () => {
-                console.error("Erro ao carregar KPIs");
-                document.getElementById('kpi-total').innerText = "-";
+                console.error("Erro ao carregar KPIs (JSONP)");
+                document.getElementById('kpi-total').innerText = "-"; // Mantém traço sem escrever ERRO na tela
             };
         }
 
