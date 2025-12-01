@@ -1,1 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>SID 98 - Detalhe (Novo)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;background:#2d6b67;color:#fff;margin:0}
+    .wrap{max-width:1100px;margin:24px auto;padding:16px;background:#fff;color:#111;border-radius:8px}
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    h1{font-size:18px;margin:0}
+    .meta{font-size:13px;color:#666;margin-bottom:12px}
+    .box{background:#f8fafb;padding:12px;border-radius:6px;border:1px solid #e2e8f0}
+    .label{font-weight:bold;margin-bottom:6px}
+    .row{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+    .btn{padding:8px 12px;border-radius:6px;border:none;cursor:pointer}
+    .btn-primary{background:#2563eb;color:#fff}
+    .btn-secondary{background:#6b7280;color:#fff}
+    pre{background:#0f172a;color:#fff;padding:12px;border-radius:6px;overflow:auto}
+    .notice{padding:8px;background:#fffbeb;border:1px solid #fcefc7;color:#92400e;border-radius:6px;margin-top:8px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>SID 98 — Detalhe (Novo)</h1>
+      <div>
+        <button class="btn btn-secondary" onclick="voltar()">Voltar</button>
+        <button class="btn btn-primary" onclick="recarregar()">Recarregar</button>
+      </div>
+    </header>
 
+    <div class="meta">Página de detalhe paralela — aceita <code>?codObra=...</code> e/ou <code>?ba=...</code></div>
+
+    <div id="conteudo" class="box">
+      <div class="label">Parâmetros recebidos</div>
+      <div id="params">Carregando parâmetros...</div>
+
+      <div class="label" style="margin-top:12px">Resumo (teste)</div>
+      <div id="resumo" style="min-height:60px">Aguardando carregamento...</div>
+
+      <div id="detalhesArea" style="margin-top:12px"></div>
+
+      <div id="log" style="margin-top:12px"></div>
+    </div>
+
+    <div style="margin-top:12px">
+      <div class="notice">
+        Observação: esta página é a versão paralela. Não altera o detalhe antigo. 
+        Quando tudo estiver pronto confirmamos a substituição.
+      </div>
+    </div>
+  </div>
+
+<script>
+  // URL do seu Apps Script (mantive a que você já usa)
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwH6dek08S8I8dpKXWYZR7flENqCXJPqtX-OlJKd9jMuVBYAR1eC5-y-eJ4RztswNQq/exec';
+
+  function getQueryParams() {
+    const q = {};
+    location.search.substring(1).split('&').forEach(kv => {
+      if (!kv) return;
+      const [k,v] = kv.split('=');
+      q[decodeURIComponent(k)] = v ? decodeURIComponent(v) : '';
+    });
+    return q;
+  }
+
+  function voltar() {
+    // volta para a página de obras
+    window.location.href = 'index_obras.html';
+  }
+  function recarregar() { window.location.reload(); }
+
+  // Inicialização: lê parâmetros e exibe esqueleto
+  (function init(){
+    const params = getQueryParams();
+    const px = document.getElementById('params');
+    px.innerHTML = '<pre>' + JSON.stringify(params, null, 2) + '</pre>';
+
+    // Preferência: usar codObra, senão ba
+    const codObra = params.codObra || params.cod || '';
+    const ba = params.ba || params.mask || '';
+
+    const resumo = document.getElementById('resumo');
+    resumo.innerHTML = '<strong>codObra:</strong> ' + (codObra || '<i>não informado</i>') +
+                       ' &nbsp;&nbsp; <strong>ba:</strong> ' + (ba || '<i>não informado</i>');
+
+    // Se nenhum parâmetro, apenas mostra instrução
+    if (!codObra && !ba) {
+      document.getElementById('detalhesArea').innerHTML = '<div style="color:#374151">Nenhum parâmetro fornecido. Use <code>?codObra=...</code> ou <code>?ba=...</code>.</div>';
+      return;
+    }
+
+    // Chamada ao backend para buscar dados reais (exemplo JSONP)
+    // Ajuste "acao" conforme seu Apps Script (ex: 'detalhes_obra' ou similar)
+    const callbackName = 'cbDetalheObra_' + Date.now();
+    window[callbackName] = function(resp) {
+      try {
+        delete window[callbackName];
+        document.body.removeChild(scriptTag);
+      } catch(e){}
+
+      if (!resp) {
+        document.getElementById('detalhesArea').innerHTML = '<div style="color:#b91c1c">Erro: resposta vazia do servidor.</div>';
+        return;
+      }
+      // Exibir resposta bruta e um resumo para testes
+      document.getElementById('detalhesArea').innerHTML = '<h3>Dados recebidos (teste)</h3><pre>' + JSON.stringify(resp, null, 2) + '</pre>';
+      // Aqui você integra os campos na UI real (substituir este bloco)
+    };
+
+    // Monta URL de exemplo (mude "acao" se seu script usar outro nome)
+    const url = SCRIPT_URL
+      + '?acao=detalhes_obra' 
+      + (codObra ? '&codObra=' + encodeURIComponent(codObra) : '')
+      + (ba ? '&ba=' + encodeURIComponent(ba) : '')
+      + '&callback=' + encodeURIComponent(callbackName);
+
+    // Cria tag script para JSONP
+    const scriptTag = document.createElement('script');
+    scriptTag.src = url;
+    scriptTag.onerror = function() {
+      document.getElementById('detalhesArea').innerHTML = '<div style="color:#b91c1c">Falha ao carregar dados do Apps Script (verifique URL/publicação).</div>';
+    };
+    document.body.appendChild(scriptTag);
+
+    // Log do que foi chamado (útil para debug)
+    const log = document.getElementById('log');
+    log.innerHTML = '<div style="font-size:12px;color:#6b7280;margin-top:8px">Chamada ao backend: <code>' + url + '</code></div>';
+  })();
+</script>
+</body>
+</html>
