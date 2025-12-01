@@ -2,31 +2,32 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>SID 98 - Enterprise (v6.7)</title>
+  <title>SID 98 - Enterprise (v6.8)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    /* ESTILOS BASE (WINDOWS 98) */
+    /* --- CORE WINDOWS 98 STYLES --- */
     :root { --win-grey:#c0c0c0; --win-blue:#000080; }
     body { font-family:'Tahoma',sans-serif; background:#008080; margin:0; height:100vh; overflow:hidden; display:flex; justify-content:center; align-items:center; }
     
-    .win-window { background:var(--win-grey); border:2px outset #fff; display:flex; flex-direction:column; box-shadow:4px 4px 10px rgba(0,0,0,0.5); }
-    .title-bar { background:linear-gradient(90deg,var(--win-blue),#1084d0); color:#fff; padding:4px; font-weight:bold; font-size:13px; display:flex; justify-content:space-between; align-items:center; }
+    .win-window { background:var(--win-grey); border:2px outset #fff; box-shadow:4px 4px 10px rgba(0,0,0,0.5); display:flex; flex-direction:column; }
+    .title-bar { background:linear-gradient(90deg,var(--win-blue),#1084d0); color:#fff; padding:3px 4px; font-weight:bold; font-size:13px; display:flex; justify-content:space-between; align-items:center; }
     
-    .btn-98 { background:var(--win-grey); border:2px outset #fff; padding:4px 10px; cursor:pointer; font-size:11px; color:#000; }
-    .btn-98:active { border-style:inset; } 
-    .primary { font-weight:bold; }
-    
-    /* LAYOUT */
-    #mainApp { width:98%; height:98vh; display:none; }
-    .app-body { flex:1; display:flex; padding:8px; gap:8px; overflow:hidden; }
-    
-    /* SIDEBAR (MENU LATERAL) */
-    .sidebar { width:220px; display:flex; flex-direction:column; gap:6px; }
-    
-    .nav-btn {
-      width: 100%; text-align: left; padding: 8px;
-      display: flex; align-items: center; gap: 8px;
+    /* WINDOW CONTROLS */
+    .controls-group { display:flex; gap:2px; }
+    .btn-win {
+      background:var(--win-grey); border:1px outset #fff; width:18px; height:18px;
+      font-size:10px; line-height:1; font-weight:bold; cursor:pointer; text-align:center;
+      color:#000;
     }
+    .btn-win:hover { background: #e0e0e0; }
+    .btn-win.close { color: #d00000; font-size: 12px; }
+    .btn-win:active { border-style:inset; }
+
+    /* LAYOUT */
+    #mainApp { width:98%; height:98vh; max-width:1400px; display:none; } 
+    .app-body { flex:1; display:flex; padding:8px; gap:8px; overflow:hidden; }
+    .sidebar { width:220px; display:flex; flex-direction:column; gap:6px; }
+    .nav-btn { width: 100%; text-align: left; padding: 8px; display: flex; align-items: center; gap: 8px; }
     .nav-btn.active { background: #fff; border-style: inset; font-weight: bold; }
     .nav-btn.disabled { color: #666; cursor: not-allowed; }
 
@@ -42,33 +43,21 @@
 
     /* MODAL GIGANTE */
     .modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:none; justify-content:center; align-items:center; z-index:9999; }
-    .modal-box { width:95%; height:95%; }
+    .modal-box { width:95%; height:95%; background:var(--win-grey); }
     .modal-content { padding:10px; height:100%; display:flex; flex-direction:column; gap:10px; }
     
-    /* MODAL: INFO */
     .info-grid { display:grid; grid-template-columns:repeat(5,1fr); background:#e0e0e0; border:2px inset #fff; padding:5px; }
     .info-item span { display:block; color:#000080; font-weight:bold; font-size:11px; }
-
-    /* MODAL: EDITOR GRID */
+    
+    /* EDITOR GRID */
     .editor-layout { flex:1; display:grid; grid-template-columns: 1fr 1fr; gap:10px; overflow:hidden; }
     .col-left, .col-right { display:flex; flex-direction:column; gap:10px; }
-    
     .group-box { border:1px solid #999; padding:5px; display:flex; flex-direction:column; background:#f0f0f0; flex:1; }
-    .group-title { font-weight:bold; margin-bottom:5px; color:#000080; font-size:11px; }
-    
     textarea { width:100%; border:2px inset #fff; font-family:'Courier New'; resize:none; flex:1; padding:5px; }
-    textarea:focus { background: #e6ffff; outline: none; }
-    
-    /* CARRINHO DE MATERIAIS */
-    .cart-controls { display:flex; gap:5px; margin-bottom:5px; align-items:center; flex-wrap:wrap; }
-    .cart-list { border:2px inset #fff; background:#fff; flex:1; overflow-y:auto; font-family:'Courier New'; font-size:12px; padding:5px; }
-    .cart-item { display:flex; justify-content:space-between; border-bottom:1px dotted #ccc; padding:2px; }
-    .cart-item:hover { background:#eee; }
-    .cart-del { color:red; cursor:pointer; font-weight:bold; margin-left:10px; }
 
   </style>
 </head>
-<body>
+<body onload="checkLoginState()">
 
   <div id="telaLogin" class="win-window" style="width:300px;">
     <div class="title-bar"><span>🔒 Login SID 98</span></div>
@@ -80,9 +69,13 @@
   </div>
 
   <div id="mainApp" class="win-window">
-    <div class="title-bar">
+    <div class="title-bar" id="appTitleBar">
       <span>GERENCIA OPERACIONAL BACKBONE</span>
-      <span id="userDisplay" style="font-size:10px;"></span>
+      <div class="controls-group">
+          <div class="btn-win" onclick="minimizeApp()">_</div>
+          <div class="btn-win" onclick="toggleMaximize()">□</div>
+          <div class="btn-win close" onclick="closeApp()">X</div>
+      </div>
     </div>
     
     <div class="app-body">
@@ -132,7 +125,7 @@
             <tbody></tbody>
           </table>
           <div id="msgInicial" style="padding:50px; text-align:center; color:#888;">
-            <p>Selecione um módulo ou faça uma busca.</p>
+            <p>Utilize a busca lateral para carregar as obras do SEG.55.</p>
           </div>
         </div>
       </div>
@@ -140,15 +133,22 @@
     
     <div style="background:var(--win-grey); border-top:2px groove #fff; padding:2px 5px; font-size:10px; display:flex; justify-content:space-between;">
       <span>Base Conectada: BASE_DASH_OBRAS</span>
-      <span>Status: Online v6.7</span>
+      <span>Status: Online v6.8</span>
     </div>
   </div>
 
   <div id="modalEdicao" class="modal-overlay">
     <div class="modal-box win-window">
-      <div class="title-bar"><span>FICHA TÉCNICA</span><button class="btn-98" onclick="closeModal()">X</button></div>
+      <div class="title-bar">
+        <span id="lblModalTitulo">FICHA TÉCNICA</span>
+        <div class="controls-group">
+            <div class="btn-win" onclick="closeModal()">X</div>
+        </div>
+      </div>
+      
       <div class="modal-content">
         <input type="hidden" id="hdnCod">
+        
         <div class="info-grid">
           <div class="info-item"><label>ID:</label><span id="vID">-</span></div>
           <div class="info-item"><label>DESC:</label><span id="vDesc">-</span></div>
@@ -172,7 +172,6 @@
           <div class="col-right">
             <div class="group-box">
               <div class="group-title">2. APLICAÇÃO DE MATERIAIS E SERVIÇOS</div>
-              
               <div class="cart-controls">
                 <select id="selTipo" onchange="filtrarCatalogo()" style="font-size:11px;">
                   <option value="CLIENTE">MATERIAL CLIENTE</option>
@@ -206,19 +205,55 @@
   let CATALOGO = { mat:[], serv:[] };
   let CARRINHO = [];
 
+  // --- FUNÇÕES DE CONTROLE DE JANELA ---
+  function minimizeApp() {
+    document.getElementById('mainApp').style.display = 'none';
+    alert("O Sistema SID 98 está rodando em segundo plano.");
+  }
+  function toggleMaximize() {
+    const app = document.getElementById('mainApp');
+    if (app.style.maxWidth === 'none' || app.style.maxWidth === '') {
+      app.style.maxWidth = '1400px';
+      app.style.height = '98vh';
+      app.style.width = '98%';
+    } else {
+      app.style.maxWidth = 'none';
+      app.style.width = '100vw';
+      app.style.height = '100vh';
+    }
+  }
+  function closeApp() {
+    if(confirm("Deseja fechar o Painel Gerencial? Você terá que fazer login novamente.")) {
+        window.close();
+    }
+  }
+  function checkLoginState() {
+      // Verifica se o usuário já fez login antes
+      const user = sessionStorage.getItem('usuarioSID');
+      if (user) {
+          document.getElementById('telaLogin').style.display = 'none';
+          document.getElementById('mainApp').style.display = 'flex';
+          document.getElementById('userDisplay').textContent = user;
+          carregarCatalogo(); 
+      }
+  }
+
+  // --- LOGIN ---
   function login() {
-    let m = document.getElementById('emailLogin').value;
-    if(!m.includes('@')) return alert('E-mail inválido');
-    jsonp('login', {email:m}, r => {
+    const email = document.getElementById('emailLogin').value;
+    if(!email.includes('@')) return alert('E-mail inválido');
+    jsonp('login', {email:email}, r => {
       if(r.sucesso) {
-        document.getElementById('telaLogin').style.display='none';
-        document.getElementById('mainApp').style.display='flex';
-        document.getElementById('userDisplay').textContent = m;
-        carregarCatalogo(); 
+        document.getElementById('telaLogin').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'flex';
+        document.getElementById('userDisplay').textContent = email;
+        sessionStorage.setItem('usuarioSID', email);
+        carregarCatalogo();
       } else alert(r.msg);
     });
   }
 
+  // --- CATÁLOGO ---
   function carregarCatalogo() {
     jsonp('listar_catalogos', {}, r => {
       CATALOGO.mat = r.materiais || [];
@@ -245,7 +280,18 @@
     let qtd = document.getElementById('qtdMat').value;
     let tipo = document.getElementById('selTipo').value;
     if(!nome || qtd<=0) return;
-    CARRINHO.push({ tipo, nome, qtd });
+    
+    // Procura o código do material/serviço no datalist antes de adicionar (melhor controle)
+    const datalist = document.getElementById('dlMateriais');
+    let codigo = '';
+    for (let i = 0; i < datalist.options.length; i++) {
+        if (datalist.options[i].value === nome) {
+            codigo = datalist.options[i].label; // O código está no label
+            break;
+        }
+    }
+    
+    CARRINHO.push({ tipo, nome, qtd, cod: codigo });
     renderCart();
     document.getElementById('buscaMat').value = '';
     document.getElementById('qtdMat').value = 1;
@@ -257,13 +303,14 @@
     CARRINHO.forEach((item, idx) => {
       let row = document.createElement('div');
       row.className = 'cart-item';
-      row.innerHTML = `<span>[${item.tipo}] ${item.qtd}x ${item.nome}</span> <span class="cart-del" onclick="delCart(${idx})">X</span>`;
+      row.innerHTML = `<span>[${item.tipo}] ${item.qtd}x ${item.nome} (${item.cod})</span> <span class="cart-del" onclick="delCart(${idx})">X</span>`;
       div.appendChild(row);
     });
   }
 
   function delCart(idx) { CARRINHO.splice(idx, 1); renderCart(); }
 
+  // --- BUSCA E MODAL ---
   function buscar() {
     let t = document.getElementById('termo').value;
     if(!t) return;
@@ -291,7 +338,10 @@
           <td style="color:#000080;font-size:10px;">${txtMas}</td>
           <td style="font-size:10px;">${txtApl}</td>
           <td style="color:red;font-weight:bold;font-size:10px;">${txtPen}</td>
-          <td style="text-align:center"><button class="btn-98" onclick="openModal('${safe}')">📝</button></td>
+          <td style="text-align:center">
+            <button class="btn-98" onclick="openModal('${safe}')">📝 ABRIR</button>
+            <button class="btn-98" onclick="alert('Funcionalidade Detalhar em construção.')">Detalhar</button>
+          </td>
         </tr>`;
       });
     });
@@ -313,8 +363,8 @@
     if(o.APLICACAO_FEITA) {
       let itens = o.APLICACAO_FEITA.split('|');
       itens.forEach(i => {
-        let match = i.trim().match(/\[(.*?)\] (\d+)x (.*)/);
-        if(match) CARRINHO.push({ tipo:match[1], qtd:match[2], nome:match[3] });
+        let match = i.trim().match(/\[(.*?)\] (\d+)x (.*?) (\((.*?)\))?$/);
+        if(match) CARRINHO.push({ tipo:match[1], qtd:match[2], nome:match[3], cod:match[5] || '' });
         else if(i.trim()) CARRINHO.push({ tipo:'TXT', qtd:1, nome:i.trim() });
       });
     }
@@ -328,7 +378,13 @@
     let cod = document.getElementById('hdnCod').value;
     let mas = document.getElementById('txtMas').value;
     let pen = document.getElementById('txtPen').value;
-    let aplTexto = CARRINHO.map(i => `[${i.tipo}] ${i.qtd}x ${i.nome}`).join(' | ');
+    
+    // Converte Carrinho para String formatada [TIPO] QTDx NOME (COD)
+    let aplTexto = CARRINHO.map(i => {
+        let nome = i.nome.trim();
+        let codDisplay = i.cod ? ` (${i.cod})` : '';
+        return `[${i.tipo}] ${i.qtd}x ${nome}${codDisplay}`;
+    }).join(' | ');
 
     let btn = document.querySelector('.modal-content .primary');
     let txt = btn.textContent; btn.textContent="..."; btn.disabled=true;
