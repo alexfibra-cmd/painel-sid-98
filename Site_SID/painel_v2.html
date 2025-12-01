@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>SID 98 - Enterprise (v6.8)</title>
+  <title>SID 98 - Enterprise (v6.9)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     /* --- CORE WINDOWS 98 STYLES --- */
@@ -54,11 +54,19 @@
     .col-left, .col-right { display:flex; flex-direction:column; gap:10px; }
     .group-box { border:1px solid #999; padding:5px; display:flex; flex-direction:column; background:#f0f0f0; flex:1; }
     textarea { width:100%; border:2px inset #fff; font-family:'Courier New'; resize:none; flex:1; padding:5px; }
+    
+    /* TASKBAR BUTTON STYLE */
+    .btn-taskbar { background:var(--win-grey); border:2px outset #fff; padding: 5px 15px; font-weight: bold; font-size: 14px; cursor: pointer; }
+    .btn-taskbar:active { border-style: inset; }
 
   </style>
 </head>
 <body onload="checkLoginState()">
 
+  <div id="taskbarBtn" style="position:fixed; bottom:10px; right:10px; z-index:9999; display:none;">
+      <button class="btn-taskbar" onclick="restoreApp()">🖥️ SID 98</button>
+  </div>
+  
   <div id="telaLogin" class="win-window" style="width:300px;">
     <div class="title-bar"><span>🔒 Login SID 98</span></div>
     <div style="padding:20px;">
@@ -133,7 +141,7 @@
     
     <div style="background:var(--win-grey); border-top:2px groove #fff; padding:2px 5px; font-size:10px; display:flex; justify-content:space-between;">
       <span>Base Conectada: BASE_DASH_OBRAS</span>
-      <span>Status: Online v6.8</span>
+      <span>Status: Online v6.9</span>
     </div>
   </div>
 
@@ -205,11 +213,17 @@
   let CATALOGO = { mat:[], serv:[] };
   let CARRINHO = [];
 
-  // --- FUNÇÕES DE CONTROLE DE JANELA ---
+  // --- FUNÇÕES DE CONTROLE DE JANELA (CORRIGIDAS) ---
   function minimizeApp() {
     document.getElementById('mainApp').style.display = 'none';
-    alert("O Sistema SID 98 está rodando em segundo plano.");
+    document.getElementById('taskbarBtn').style.display = 'block'; // Mostra o botão da Taskbar
   }
+  
+  function restoreApp() {
+      document.getElementById('mainApp').style.display = 'flex';
+      document.getElementById('taskbarBtn').style.display = 'none'; // Esconde o botão da Taskbar
+  }
+
   function toggleMaximize() {
     const app = document.getElementById('mainApp');
     if (app.style.maxWidth === 'none' || app.style.maxWidth === '') {
