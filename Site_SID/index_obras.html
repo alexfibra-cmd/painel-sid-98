@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>SID 98 - Obras / Medição</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+    }
+    header {
+      background-color: #1f2933;
+      color: #fff;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header h1 {
+      font-size: 16px;
+      margin: 0;
+    }
+    .container {
+      padding: 16px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      color: #333;
+      margin-bottom: 4px;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      box-sizing: border-box;
+      margin-bottom: 8px;
+    }
+    button {
+      border: none;
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background-color: #2563eb;
+      color: #fff;
+    }
+    .btn-secondary {
+      background-color: #6b7280;
+      color: #fff;
+    }
+    .btn-small {
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+    .result-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .result-table th,
+    .result-table td {
+      border: 1px solid #ddd;
+      padding: 6px 8px;
+      text-align: left;
+    }
+    .result-table th {
+      background-color: #e5e7eb;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-size: 11px;
+      background: #e5e7eb;
+      color: #111827;
+    }
+    #mensagem {
+      font-size: 13px;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>SID 98 - Obras / Medição</h1>
+  <button class="btn-secondary btn-small" onclick="voltarDashboard()">Voltar</button>
+</header>
+
+<div class="container">
+  <div class="card">
+    <label for="termoBusca">Buscar obra</label>
+    <input 
+      type="text" 
+      id="termoBusca" 
+      placeholder="Digite COD_OBRA (20...), início da BA (21...) ou parte da descrição..."
+    >
+    <button class="btn-primary" onclick="buscarObras()">Buscar</button>
+    <div id="mensagem"></div>
+  </div>
+
+  <div id="areaResultados" class="card" style="display:none;">
+    <h3 style="margin-top:0;font-size:14px;">Resultados</h3>
+    <div id="tabelaResultados"></div>
+  </div>
+</div>
+
+<script>
+  // URL do seu Web App do Google Apps Script
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwH6dek08S8I8dpKXWYZR7flENqCXJPqtX-OlJKd9jMuVBYAR1eC5-y-eJ4RztswNQq/exec';
+
+  function voltarDashboard() {
+    // se você tiver um index principal, coloque o caminho certo aqui
+    window.location.href = 'index.html';
+  }
+
+  function buscarObras() {
+    const termo = document.getElementById('termoBusca').value.trim();
+    const mensagemEl = document.getElementById('mensagem');
+    const areaResultados = document.getElementById('areaResultados');
+    const tabelaResultados = document.getElementById('tabelaResultados');
+
+    mensagemEl.textContent = '';
+    areaResultados.style.display = 'none';
+    tabelaResultados.innerHTML = '';
+
+    if (!termo) {
+      mensagemEl.textContent = 'Digite algum termo para buscar.';
+      return;
+    }
+
+    mensagemEl.textContent = 'Buscando...';
+
+    const callbackName = 'callbackResolverObra_' + Date.now();
+
+    window[callbackName] = function(resposta) {
+      // limpa o script e o callback depois de usar
+      delete window[callbackName];
+      document.body.removeChild(script);
+
+      if (!resposta || !resposta.sucesso) {
+        mensagemEl.textContent = resposta && resposta.mensagem ? resposta.mensagem : 'Erro na busca.';
+        return;
+      }
+
+      mensagemEl.textContent = resposta.mensagem;
+
+      const obras = resposta.obras || [];
+      if (obras.length === 0) {
+        areaResultados.style.display = 'none';
+        tabelaResultados.innerHTML = '';
+        return;
+      }
+
+      let html = '<table class="result-table">';
+      html += '<tr><th>Cód. Obra</th><th>Descrição</th><th>Máscara BA</th><th>Ações</th></tr>';
+
+      obras.forEach(obra => {
+        const cod = obra['COD_OBRA_NUM'] || '';
+        const desc = obra['DESCRICAO'] || '';
+        const mascara = obra['MASCARA_BA'] || '';
+
+        html += '<tr>';
+        html += '<td><span class="badge">' + cod + '</span></td>';
+        html += '<td>' + desc + '</td>';
+        html += '<td>' + mascara + '</td>';
+        html += '<td><button class="btn-primary btn-small" onclick="abrirDetalhe(\'' + cod + '\')">Detalhar</button></td>';
+        html += '</tr>';
+      });
+
+      html += '</table>';
+
+      tabelaResultados.innerHTML = html;
+      areaResultados.style.display = 'block';
+    };
+
+    const url = SCRIPT_URL 
+      + '?acao=resolver_obra'
+      + '&termo=' + encodeURIComponent(termo)
+      + '&callback=' + encodeURIComponent(callbackName);
+
+    const script = document.createElement('script');
+    script.src = url;
+    document.body.appendChild(script);
+  }
+
+  function abrirDetalhe(codObra) {
+    // nova página de detalhe específica de obras
+    window.location.href = 'detalhe_obra_obras.html?codObra=' + encodeURIComponent(codObra);
+  }
+</script>
+
+</body>
+</html>
