@@ -2,352 +2,279 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>SID 98 - Gerência Operacional Backbone</title>
+  <title>SID 98 - Enterprise (v5.3)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
   <style>
-    /* --- CORE WINDOWS 98 STYLES --- */
-    :root {
-      --win-grey: #c0c0c0; --win-blue: #000080; --win-white: #ffffff; --win-black: #000000;
-    }
-    * { box-sizing: border-box; }
-    body {
-      font-family: 'Tahoma', sans-serif; margin: 0; padding: 0;
-      background-color: #008080; display: flex; justify-content: center; align-items: center;
-      height: 100vh; overflow: hidden;
-    }
-
-    .win-window {
-      background-color: var(--win-grey);
-      border: 2px outset #fff; box-shadow: 4px 4px 10px rgba(0,0,0,0.5);
-      display: flex; flex-direction: column;
-    }
-
-    .title-bar {
-      background: linear-gradient(90deg, var(--win-blue), #1084d0);
-      padding: 4px; display: flex; justify-content: space-between; align-items: center; color: white; font-weight: bold; font-size: 13px;
-    }
-
-    .btn-98 {
-      background: var(--win-grey); border: 2px outset white;
-      padding: 6px 12px; font-size: 12px; cursor: pointer; color: black;
-    }
-    .btn-98:active { border-style: inset; padding-top: 7px; }
-    .btn-98.primary { font-weight: bold; }
+    /* ESTILOS BASE (WINDOWS 98) */
+    :root { --win-grey:#c0c0c0; --win-blue:#000080; }
+    body { font-family:'Tahoma',sans-serif; background:#008080; margin:0; height:100vh; overflow:hidden; display:flex; justify-content:center; align-items:center; }
+    .win-window { background:var(--win-grey); border:2px outset #fff; display:flex; flex-direction:column; box-shadow:4px 4px 10px rgba(0,0,0,0.5); }
+    .title-bar { background:linear-gradient(90deg,var(--win-blue),#1084d0); color:#fff; padding:4px; font-weight:bold; font-size:13px; display:flex; justify-content:space-between; }
+    .btn-98 { background:var(--win-grey); border:2px outset #fff; padding:4px 10px; cursor:pointer; font-size:11px; }
+    .btn-98:active { border-style:inset; } .primary { font-weight:bold; }
     
-    /* --- TELA DE LOGIN --- */
-    #telaLogin {
-      width: 350px; z-index: 10000;
-    }
+    /* LAYOUT */
+    #mainApp { width:98%; height:98vh; display:none; }
+    .app-body { flex:1; display:flex; padding:8px; gap:8px; overflow:hidden; }
+    .sidebar { width:220px; display:flex; flex-direction:column; gap:8px; }
+    .content-area { flex:1; background:#fff; border:2px inset #fff; display:flex; flex-direction:column; }
+    .table-container { flex:1; overflow:auto; }
+    table { width:100%; border-collapse:collapse; font-size:11px; }
+    th { background:var(--win-grey); position:sticky; top:0; text-align:left; border:1px outset #fff; padding:5px; }
+    td { border:1px solid #ddd; padding:5px; } tr:hover { background:#000080; color:#fff; }
+
+    /* MODAL GIGANTE */
+    .modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:none; justify-content:center; align-items:center; z-index:9999; }
+    .modal-box { width:95%; height:95%; }
+    .modal-content { padding:10px; height:100%; display:flex; flex-direction:column; gap:10px; }
     
-    /* --- TELA PRINCIPAL (DASHBOARD) --- */
-    #mainApp { width: 98%; height: 98vh; max-width: 1400px; display: none; } /* Começa oculto */
+    /* MODAL: INFO */
+    .info-grid { display:grid; grid-template-columns:repeat(5,1fr); background:#e0e0e0; border:2px inset #fff; padding:5px; }
+    .info-item span { display:block; color:#000080; font-weight:bold; font-size:11px; }
 
-    .app-body { flex: 1; display: flex; padding: 8px; gap: 8px; overflow: hidden; }
-
-    /* Menu Lateral (Segmentos) */
-    .sidebar { width: 220px; display: flex; flex-direction: column; gap: 8px; }
-    .nav-btn {
-      width: 100%; text-align: left; padding: 10px; margin-bottom: 5px;
-      display: flex; align-items: center; gap: 10px;
-    }
-    .nav-btn.active { background: #fff; border-style: inset; font-weight: bold; }
-    .nav-btn.disabled { color: #888; cursor: not-allowed; }
-
-    /* Área Central */
-    .content-area { flex: 1; border: 2px inset white; background: white; display: flex; flex-direction: column; }
+    /* MODAL: EDITOR GRID */
+    .editor-layout { flex:1; display:grid; grid-template-columns: 1fr 1fr; gap:10px; overflow:hidden; }
+    .col-left, .col-right { display:flex; flex-direction:column; gap:10px; }
     
-    /* Tabela */
-    .table-container { flex: 1; overflow: auto; background: #fff; }
-    table { width: 100%; border-collapse: collapse; font-size: 11px; }
-    thead th { background: var(--win-grey); border: 1px outset white; padding: 5px; text-align: left; position: sticky; top: 0; z-index: 10; }
-    td { border: 1px solid #ddd; padding: 5px; }
-    tr:hover { background: #000080; color: white; }
-    .status-badge { padding: 2px 5px; border-radius: 3px; font-weight: bold; font-size: 10px; border: 1px solid #999; }
-
-    /* --- MODAL GIGANTE --- */
-    .modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.6); z-index: 9999; display: none; justify-content: center; align-items: center;
-    }
-    .modal-box { width: 95%; height: 95%; background: var(--win-grey); }
-    .modal-content { padding: 10px; height: 100%; display: flex; flex-direction: column; }
-
-    .info-grid {
-      display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px;
-      background: #e0e0e0; border: 2px inset white; padding: 5px; margin-bottom: 5px;
-    }
-    .info-item label { font-size: 10px; font-weight: bold; color: #666; }
-    .info-item span { display: block; font-weight: bold; color: #000080; font-size: 11px; }
-
-    /* Áreas de Edição (Os 3 Blocos) */
-    .edit-grid {
-      flex: 1; display: grid; grid-template-rows: 1fr 1fr 1fr; gap: 10px; overflow: hidden;
-    }
-    .edit-block { display: flex; flex-direction: column; border: 1px solid #999; padding: 5px; background: #f0f0f0; }
-    .edit-block label { font-weight: bold; color: #000; margin-bottom: 3px; font-size: 12px; }
+    .group-box { border:1px solid #999; padding:5px; display:flex; flex-direction:column; background:#f0f0f0; flex:1; }
+    .group-title { font-weight:bold; margin-bottom:5px; color:#000080; font-size:11px; }
     
-    textarea {
-      flex: 1; width: 100%; border: 2px inset white; resize: none;
-      font-family: 'Courier New', monospace; font-size: 14px; padding: 5px;
-    }
-    textarea:focus { background: #e6ffff; outline: none; }
-
-    /* Cor Específica para Pendência */
-    .edit-block.alert { background: #ffe6e6; border-color: #ff0000; }
-    .edit-block.alert label { color: #cc0000; }
+    textarea { width:100%; border:2px inset #fff; font-family:'Courier New'; resize:none; flex:1; }
+    
+    /* CARRINHO DE MATERIAIS */
+    .cart-controls { display:flex; gap:5px; margin-bottom:5px; align-items:center; flex-wrap:wrap; }
+    .cart-list { border:2px inset #fff; background:#fff; flex:1; overflow-y:auto; font-family:'Courier New'; font-size:12px; padding:5px; }
+    .cart-item { display:flex; justify-content:space-between; border-bottom:1px dotted #ccc; padding:2px; }
+    .cart-item:hover { background:#eee; }
+    .cart-del { color:red; cursor:pointer; font-weight:bold; margin-left:10px; }
 
   </style>
 </head>
 <body>
 
-  <div id="telaLogin" class="win-window">
-    <div class="title-bar"><span>🔒 Acesso Restrito</span></div>
-    <div style="padding: 20px;">
-      <p style="font-size:12px; margin-top:0;">Identifique-se para acessar o Backbone:</p>
-      <label style="font-size:11px; font-weight:bold;">E-mail Corporativo:</label>
-      <input type="text" id="emailLogin" style="width:100%; margin-bottom:15px; padding:5px;">
-      <button class="btn-98 primary" style="width:100%" onclick="fazerLogin()">ENTRAR NO SISTEMA</button>
-      <p id="msgLogin" style="color:red; font-size:11px; min-height:15px; margin-bottom:0;"></p>
+  <div id="telaLogin" class="win-window" style="width:300px;">
+    <div class="title-bar"><span>🔒 Login SID 98</span></div>
+    <div style="padding:20px;">
+      <label>E-mail:</label><input type="text" id="emailLogin" style="width:100%;margin-bottom:10px;">
+      <button class="btn-98 primary" style="width:100%" onclick="login()">ENTRAR</button>
     </div>
   </div>
 
   <div id="mainApp" class="win-window">
-    <div class="title-bar">
-      <span>GERENCIA OPERACIONAL BACKBONE (v5.0)</span>
-      <div style="font-size:11px;">Usuário: <span id="userDisplay">---</span></div>
-    </div>
-
+    <div class="title-bar"><span>GERÊNCIA BACKBONE v5.3</span> <span id="userDisplay"></span></div>
     <div class="app-body">
       <div class="sidebar">
-        <div style="padding:5px; border:2px groove #fff; margin-bottom:5px;">
-          <label style="font-size:10px; color:#666;">BUSCAR OBRA (SEG.55):</label>
-          <input type="text" id="termoBusca" placeholder="ID ou Descrição..." style="width:100%" onkeydown="if(event.key==='Enter') buscarObras()">
-          <button class="btn-98" style="width:100%; margin-top:3px;" onclick="buscarObras()">🔎 Localizar</button>
+        <div style="border:2px groove #fff; padding:5px;">
+          <input type="text" id="termo" placeholder="Buscar Obra..." style="width:100%" onkeydown="if(event.key=='Enter') buscar()">
+          <button class="btn-98" style="width:100%; margin-top:2px;" onclick="buscar()">🔎 Localizar</button>
         </div>
-
-        <button class="btn-98 nav-btn active">
-          🛠️ <b>SEG.55 - MANUTENÇÃO</b>
-        </button>
-        
-        <button class="btn-98 nav-btn disabled" onclick="alert('Módulo em Desenvolvimento.')">
-          📡 RDO - MELHORIA (DC)
-        </button>
-        
-        <button class="btn-98 nav-btn disabled" onclick="alert('Módulo em Desenvolvimento.')">
-          💰 SALDO GESTECH
-        </button>
-        
-        <button class="btn-98 nav-btn disabled" onclick="alert('Módulo em Desenvolvimento.')">
-          📅 ESCALA PLANTÃO
-        </button>
+        <button class="btn-98 primary" style="text-align:left;">🛠️ SEG.55 - MANUTENÇÃO</button>
+        <button class="btn-98" style="text-align:left; color:#888;">📡 SEG.63 (Em breve)</button>
       </div>
-
       <div class="content-area">
         <div class="table-container">
-          <table id="tabelaResultados">
-            <thead>
-              <tr>
-                <th width="8%">ID</th>
-                <th width="8%">Operadora</th>
-                <th width="20%">Descrição</th>
-                <th width="10%">Status</th>
-                <th width="10%">Supervisor</th>
-                <th width="12%">Máscara BA</th>
-                <th width="12%">Aplicação</th>
-                <th width="10%">Pendência</th>
-                <th width="8%" style="text-align:center">Ação</th>
-              </tr>
-            </thead>
-            <tbody id="tbodyResultados"></tbody>
-          </table>
-          <div id="msgInicial" style="padding:50px; text-align:center; color:#888;">
-            <p>Bem-vindo ao Painel Gerencial Backbone.</p>
-            <p>Utilize a busca lateral para carregar as obras do SEG.55.</p>
-          </div>
+          <table id="tbResult"><thead><tr><th>ID</th><th>Operadora</th><th>Desc</th><th>Status</th><th>Sup</th><th>Ação</th></tr></thead><tbody></tbody></table>
         </div>
       </div>
-    </div>
-    
-    <div style="background:var(--win-grey); border-top:2px groove #fff; padding:2px 5px; font-size:10px;">
-      Base Conectada: BASE_DASH_OBRAS | Status: Online
     </div>
   </div>
 
   <div id="modalEdicao" class="modal-overlay">
     <div class="modal-box win-window">
-      <div class="title-bar">
-        <span id="lblModalTitulo">FICHA DA OBRA</span>
-        <button class="btn-98" style="padding:0 5px;" onclick="fecharModal()">X</button>
-      </div>
+      <div class="title-bar"><span>FICHA TÉCNICA</span><button class="btn-98" onclick="closeModal()">X</button></div>
       <div class="modal-content">
-        <input type="hidden" id="hdnCodObra">
-
+        <input type="hidden" id="hdnCod">
         <div class="info-grid">
-          <div class="info-item"><label>ID:</label><span id="viewId">-</span></div>
-          <div class="info-item"><label>DESCRIÇÃO:</label><span id="viewDesc">-</span></div>
-          <div class="info-item"><label>OPERADORA:</label><span id="viewOperadora">-</span></div>
-          <div class="info-item"><label>STATUS:</label><span id="viewStatus">-</span></div>
-          <div class="info-item"><label>SUPERVISOR:</label><span id="viewSupervisor">-</span></div>
+          <div class="info-item"><label>ID:</label><span id="vID">-</span></div>
+          <div class="info-item"><label>DESC:</label><span id="vDesc">-</span></div>
+          <div class="info-item"><label>OP:</label><span id="vOp">-</span></div>
+          <div class="info-item"><label>STATUS:</label><span id="vSt">-</span></div>
+          <div class="info-item"><label>SUP:</label><span id="vSup">-</span></div>
         </div>
 
-        <div class="edit-grid">
-          
-          <div class="edit-block">
-            <label>1. MÁSCARA DO BA (DESCRIÇÃO TÉCNICA DETALHADA):</label>
-            <textarea id="txtMascara" placeholder="Descreva aqui o serviço realizado no BA..."></textarea>
+        <div class="editor-layout">
+          <div class="col-left">
+            <div class="group-box">
+              <div class="group-title">1. MÁSCARA / RELATÓRIO TÉCNICO</div>
+              <textarea id="txtMas" placeholder="Descreva o serviço..."></textarea>
+            </div>
+            <div class="group-box" style="background:#fff0f0; border-color:red;">
+              <div class="group-title" style="color:red;">3. PENDÊNCIAS / DEVOLUÇÃO</div>
+              <textarea id="txtPen" placeholder="Motivo de devolução..."></textarea>
+            </div>
           </div>
 
-          <div class="edit-block">
-            <label>2. APLICAÇÃO DE MATERIAIS / SERVIÇOS:</label>
-            <textarea id="txtAplicacao" placeholder="Listagem de materiais aplicados..."></textarea>
-          </div>
+          <div class="col-right">
+            <div class="group-box">
+              <div class="group-title">2. APLICAÇÃO DE MATERIAIS E SERVIÇOS</div>
+              
+              <div class="cart-controls">
+                <select id="selTipo" onchange="filtrarCatalogo()">
+                  <option value="CLIENTE">MATERIAL CLIENTE (VTAL)</option>
+                  <option value="PROPRIO">MATERIAL PRÓPRIO (TEL)</option>
+                  <option value="SERVICO">SERVIÇOS (LPU)</option>
+                </select>
+                <input type="text" id="buscaMat" list="dlMateriais" placeholder="Digite o item..." style="flex:1;">
+                <datalist id="dlMateriais"></datalist>
+                <input type="number" id="qtdMat" value="1" style="width:50px;">
+                <button class="btn-98" onclick="addCart()">➕ ADD</button>
+              </div>
 
-          <div class="edit-block alert">
-            <label>3. MOTIVO DE DEVOLUÇÃO / PENDÊNCIAS:</label>
-            <textarea id="txtPendencia" placeholder="Se a obra foi devolvida, explique o motivo aqui..."></textarea>
+              <div class="cart-list" id="listaCarrinho"></div>
+              
+              <div style="font-size:10px; color:#666; margin-top:2px;">* Itens adicionados serão salvos no campo Aplicação.</div>
+            </div>
           </div>
-
         </div>
 
-        <div style="margin-top:10px; text-align:right;">
-          <button class="btn-98" onclick="fecharModal()">CANCELAR</button>
-          <button class="btn-98 primary" onclick="salvarEdicao()">💾 SALVAR FICHA TÉCNICA</button>
+        <div style="text-align:right; border-top:1px solid #999; padding-top:5px;">
+          <button class="btn-98" onclick="closeModal()">CANCELAR</button>
+          <button class="btn-98 primary" onclick="salvar()">💾 SALVAR DADOS</button>
         </div>
       </div>
     </div>
   </div>
 
 <script>
-  // LINK DO SCRIPT (Verifique se é o atual)
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwH6dek08S8I8dpKXWYZR7flENqCXJPqtX-OlJKd9jMuVBYAR1eC5-y-eJ4RztswNQq/exec';
+  const API = 'https://script.google.com/macros/s/AKfycbwH6dek08S8I8dpKXWYZR7flENqCXJPqtX-OlJKd9jMuVBYAR1eC5-y-eJ4RztswNQq/exec';
+  let CATALOGO = { mat:[], serv:[] };
+  let CARRINHO = [];
 
-  // --- LOGIN ---
-  function fazerLogin() {
-    const email = document.getElementById('emailLogin').value.trim();
-    const btn = document.querySelector('#telaLogin button');
-    const msg = document.getElementById('msgLogin');
-
-    if(!email || !email.includes('@')) {
-      msg.textContent = "Digite um e-mail válido."; return;
-    }
-
-    btn.textContent = "Verificando...";
-    btn.disabled = true;
-
-    const cb = 'cb_login_' + Date.now();
-    window[cb] = function(res) {
-      delete window[cb]; document.body.removeChild(tag);
-      
-      if(res.sucesso) {
-        document.getElementById('telaLogin').style.display = 'none';
-        document.getElementById('mainApp').style.display = 'flex';
-        document.getElementById('userDisplay').textContent = email;
-        sessionStorage.setItem('usuarioSID', email);
-      } else {
-        msg.textContent = res.msg;
-        btn.textContent = "ENTRAR NO SISTEMA";
-        btn.disabled = false;
-      }
-    };
-
-    const tag = document.createElement('script');
-    tag.src = SCRIPT_URL + `?acao=login&email=${encodeURIComponent(email)}&callback=${cb}`;
-    document.body.appendChild(tag);
+  function login() {
+    let m = document.getElementById('emailLogin').value;
+    if(!m.includes('@')) return alert('E-mail inválido');
+    jsonp('login', {email:m}, r => {
+      if(r.sucesso) {
+        document.getElementById('telaLogin').style.display='none';
+        document.getElementById('mainApp').style.display='flex';
+        document.getElementById('userDisplay').textContent = m;
+        carregarCatalogo(); // Carrega materiais no background
+      } else alert(r.msg);
+    });
   }
 
-  // --- BUSCA ---
-  function buscarObras() {
-    const termo = document.getElementById('termoBusca').value.trim();
-    const tbody = document.getElementById('tbodyResultados');
-    const msg = document.getElementById('msgInicial');
-
-    if(!termo) return alert("Digite algo para buscar.");
-
-    tbody.innerHTML = '';
-    msg.style.display = 'block';
-    msg.innerHTML = 'Carregando SEG.55...';
-
-    const cb = 'cb_busca_' + Date.now();
-    window[cb] = function(res) {
-      delete window[cb]; document.body.removeChild(tag);
-      
-      if(!res.sucesso) { msg.innerHTML = 'Erro: ' + res.mensagem; return; }
-      if(res.obras.length === 0) { msg.innerHTML = 'Nenhuma obra encontrada.'; return; }
-
-      msg.style.display = 'none';
-
-      res.obras.forEach(o => {
-        const safeData = encodeURIComponent(JSON.stringify(o));
-        let corStatus = "#eee";
-        if(o.STATUS.includes("PENDENTE")) corStatus = "#ffff99";
-        if(o.STATUS.includes("CONCLUÍDO")) corStatus = "#99ff99";
-
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td><b>${o.COD_OBRA_NUM}</b></td>
-          <td>${o.OPERADORA}</td>
-          <td>${o.DESCRICAO}</td>
-          <td><span class="status-badge" style="background:${corStatus}">${o.STATUS}</span></td>
-          <td>${o.SUPERVISOR}</td>
-          <td style="color:#000080; font-size:10px;">${(o.MASCARA_BA||'').substring(0,30)}...</td>
-          <td style="font-size:10px;">${(o.APLICACAO_FEITA||'').substring(0,30)}...</td>
-          <td style="color:red; font-weight:bold; font-size:10px;">${(o.PENDENCIA_DEVOLUCAO||'').substring(0,30)}...</td>
-          <td style="text-align:center"><button class="btn-98" onclick="abrirModal('${safeData}')">📝 ABRIR</button></td>
-        `;
-        tbody.appendChild(tr);
-      });
-    };
-
-    const tag = document.createElement('script');
-    tag.src = SCRIPT_URL + `?acao=resolver_obra&termo=${encodeURIComponent(termo)}&callback=${cb}`;
-    document.body.appendChild(tag);
+  function carregarCatalogo() {
+    jsonp('listar_catalogos', {}, r => {
+      CATALOGO.mat = r.materiais || [];
+      CATALOGO.serv = r.servicos || [];
+      filtrarCatalogo();
+    });
   }
 
-  // --- MODAL ---
-  function abrirModal(safeData) {
-    const o = JSON.parse(decodeURIComponent(safeData));
+  function filtrarCatalogo() {
+    let tipo = document.getElementById('selTipo').value;
+    let dl = document.getElementById('dlMateriais');
+    dl.innerHTML = '';
+    let lista = (tipo === 'SERVICO') ? CATALOGO.serv : CATALOGO.mat.filter(m => m.origem === tipo);
     
-    document.getElementById('hdnCodObra').value = o.COD_OBRA_NUM;
-    document.getElementById('viewId').textContent = o.COD_OBRA_NUM;
-    document.getElementById('viewDesc').textContent = o.DESCRICAO;
-    document.getElementById('viewOperadora').textContent = o.OPERADORA;
-    document.getElementById('viewStatus').textContent = o.STATUS;
-    document.getElementById('viewSupervisor').textContent = o.SUPERVISOR;
+    lista.forEach(i => {
+      let op = document.createElement('option');
+      op.value = i.desc; // Mostra nome
+      op.label = i.cod;  // Código escondido
+      dl.appendChild(op);
+    });
+    document.getElementById('buscaMat').value = '';
+  }
 
-    document.getElementById('txtMascara').value = o.MASCARA_BA || '';
-    document.getElementById('txtAplicacao').value = o.APLICACAO_FEITA || '';
-    document.getElementById('txtPendencia').value = o.PENDENCIA_DEVOLUCAO || ''; // NOVO
+  function addCart() {
+    let nome = document.getElementById('buscaMat').value;
+    let qtd = document.getElementById('qtdMat').value;
+    let tipo = document.getElementById('selTipo').value;
+    if(!nome || qtd<=0) return;
 
+    CARRINHO.push({ tipo, nome, qtd });
+    renderCart();
+    document.getElementById('buscaMat').value = '';
+    document.getElementById('qtdMat').value = 1;
+  }
+
+  function renderCart() {
+    let div = document.getElementById('listaCarrinho');
+    div.innerHTML = '';
+    CARRINHO.forEach((item, idx) => {
+      let row = document.createElement('div');
+      row.className = 'cart-item';
+      row.innerHTML = `<span>[${item.tipo}] ${item.qtd}x ${item.nome}</span> <span class="cart-del" onclick="delCart(${idx})">X</span>`;
+      div.appendChild(row);
+    });
+  }
+
+  function delCart(idx) {
+    CARRINHO.splice(idx, 1);
+    renderCart();
+  }
+
+  function buscar() {
+    let t = document.getElementById('termo').value;
+    if(!t) return;
+    document.getElementById('tbResult').querySelector('tbody').innerHTML = '<tr><td colspan="6">Buscando...</td></tr>';
+    jsonp('resolver_obra', {termo:t}, r => {
+      let tb = document.getElementById('tbResult').querySelector('tbody');
+      tb.innerHTML = '';
+      if(!r.obras.length) return tb.innerHTML='<tr><td colspan="6">Nada encontrado.</td></tr>';
+      r.obras.forEach(o => {
+        let safe = encodeURIComponent(JSON.stringify(o));
+        tb.innerHTML += `<tr><td>${o.COD_OBRA_NUM}</td><td>${o.OPERADORA}</td><td>${o.DESCRICAO}</td><td>${o.STATUS}</td><td>${o.SUPERVISOR}</td><td><button class="btn-98" onclick="openModal('${safe}')">EDITAR</button></td></tr>`;
+      });
+    });
+  }
+
+  function openModal(safe) {
+    let o = JSON.parse(decodeURIComponent(safe));
+    document.getElementById('hdnCod').value = o.COD_OBRA_NUM;
+    document.getElementById('vID').textContent = o.COD_OBRA_NUM;
+    document.getElementById('vDesc').textContent = o.DESCRICAO;
+    document.getElementById('vOp').textContent = o.OPERADORA;
+    document.getElementById('vSt').textContent = o.STATUS;
+    document.getElementById('vSup').textContent = o.SUPERVISOR;
+    
+    document.getElementById('txtMas').value = o.MASCARA_BA || '';
+    document.getElementById('txtPen').value = o.PENDENCIA_DEVOLUCAO || '';
+    
+    // Converte texto da Aplicação de volta para Carrinho (Parser simples)
+    CARRINHO = [];
+    if(o.APLICACAO_FEITA) {
+      // Tenta quebrar por Pipe |
+      let itens = o.APLICACAO_FEITA.split('|');
+      itens.forEach(i => {
+        let match = i.trim().match(/\[(.*?)\] (\d+)x (.*)/);
+        if(match) CARRINHO.push({ tipo:match[1], qtd:match[2], nome:match[3] });
+        else if(i.trim()) CARRINHO.push({ tipo:'TXT', qtd:1, nome:i.trim() }); // Caso legado
+      });
+    }
+    renderCart();
+    
     document.getElementById('modalEdicao').style.display = 'flex';
   }
 
-  function fecharModal() { document.getElementById('modalEdicao').style.display = 'none'; }
+  function closeModal() { document.getElementById('modalEdicao').style.display = 'none'; }
 
-  function salvarEdicao() {
-    const cod = document.getElementById('hdnCodObra').value;
-    const mas = document.getElementById('txtMascara').value;
-    const apl = document.getElementById('txtAplicacao').value;
-    const pen = document.getElementById('txtPendencia').value;
+  function salvar() {
+    let cod = document.getElementById('hdnCod').value;
+    let mas = document.getElementById('txtMas').value;
+    let pen = document.getElementById('txtPen').value;
+    
+    // Converte Carrinho para String
+    let aplTexto = CARRINHO.map(i => `[${i.tipo}] ${i.qtd}x ${i.nome}`).join(' | ');
 
-    const btn = document.querySelector('#modalEdicao .primary');
-    const txtOrig = btn.textContent;
-    btn.textContent = "SALVANDO..."; btn.disabled = true;
+    let btn = document.querySelector('.modal-content .primary');
+    let txt = btn.textContent; btn.textContent="..."; btn.disabled=true;
 
-    const cb = 'cb_save_' + Date.now();
-    window[cb] = function(res) {
-      delete window[cb]; document.body.removeChild(tag);
-      btn.textContent = txtOrig; btn.disabled = false;
-      if(res.sucesso) { alert("Salvo!"); fecharModal(); buscarObras(); }
-      else { alert("Erro: " + res.mensagem); }
-    };
+    jsonp('atualizar_anotacoes_obra', {codObra:cod, mascaraBa:mas, aplicacaoFeita:aplTexto, pendencia:pen}, r => {
+      btn.textContent=txt; btn.disabled=false;
+      if(r.sucesso) { alert('Salvo!'); closeModal(); buscar(); }
+      else alert(r.mensagem);
+    });
+  }
 
-    const tag = document.createElement('script');
-    // Envia os 3 campos
-    tag.src = SCRIPT_URL + `?acao=atualizar_anotacoes_obra&codObra=${encodeURIComponent(cod)}&mascaraBa=${encodeURIComponent(mas)}&aplicacaoFeita=${encodeURIComponent(apl)}&pendencia=${encodeURIComponent(pen)}&callback=${cb}`;
-    document.body.appendChild(tag);
+  function jsonp(acao, params, cb) {
+    let n = 'cb_'+Date.now();
+    window[n] = (r) => { delete window[n]; document.body.removeChild(s); cb(r); };
+    let q = Object.keys(params).map(k=>k+'='+encodeURIComponent(params[k])).join('&');
+    let s = document.createElement('script');
+    s.src = API + '?acao='+acao+'&callback='+n+(q?'&'+q:'');
+    document.body.appendChild(s);
   }
 </script>
-
 </body>
 </html>
