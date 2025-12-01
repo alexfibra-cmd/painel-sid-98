@@ -126,7 +126,6 @@
   const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwH6dek08S8I8dpKXWYZR7flENqCXJPqtX-OlJKd9jMuVBYAR1eC5-y-eJ4RztswNQq/exec';
 
   function voltarDashboard() {
-    // se você tiver um index principal, coloque o caminho certo aqui
     window.location.href = 'index.html';
   }
 
@@ -150,7 +149,6 @@
     const callbackName = 'callbackResolverObra_' + Date.now();
 
     window[callbackName] = function(resposta) {
-      // limpa o script e o callback depois de usar
       delete window[callbackName];
       document.body.removeChild(script);
 
@@ -201,8 +199,7 @@
   }
 
   function abrirDetalhe(codObra) {
-    // nova página de detalhe específica de obras
-    window.location.href = 'detalhe_obra_obras.html?codObra=' + encodeURIComponent(codObra);
+    window.location.href = 'detalhe_obra.html?codObra=' + encodeURIComponent(codObra);
   }
 </script>
 
