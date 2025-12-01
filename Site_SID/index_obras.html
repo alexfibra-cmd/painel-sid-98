@@ -197,11 +197,8 @@
     document.body.appendChild(script);
   }
 
-  function abrirDetalhe(codObra) {
-    window.location.href = 'https://alexfibra-cmd.github.io/painel-sid-98/Site_SID/detalhe_obra.html?codObra=' 
-      + encodeURIComponent(codObra);
-  }
-</script>
-
-</body>
-</html>
+ function abrirDetalhe(codObra) {
+  // abre a versão paralela (não altera o detalhe antigo)
+  window.location.href = 'https://alexfibra-cmd.github.io/painel-sid-98/Site_SID/detalhe_obra_novo.html?codObra=' 
+    + encodeURIComponent(codObra);
+}
