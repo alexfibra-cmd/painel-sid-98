@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>SID 98 - Enterprise (v6.9)</title>
+  <title>SID 98 - Enterprise (v7.1 Final)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     /* --- CORE WINDOWS 98 STYLES --- */
@@ -14,11 +14,7 @@
     
     /* WINDOW CONTROLS */
     .controls-group { display:flex; gap:2px; }
-    .btn-win {
-      background:var(--win-grey); border:1px outset #fff; width:18px; height:18px;
-      font-size:10px; line-height:1; font-weight:bold; cursor:pointer; text-align:center;
-      color:#000;
-    }
+    .btn-win { background:var(--win-grey); border:1px outset #fff; width:18px; height:18px; font-size:10px; line-height:1; font-weight:bold; cursor:pointer; text-align:center; color:#000; }
     .btn-win:hover { background: #e0e0e0; }
     .btn-win.close { color: #d00000; font-size: 12px; }
     .btn-win:active { border-style:inset; }
@@ -58,6 +54,12 @@
     /* TASKBAR BUTTON STYLE */
     .btn-taskbar { background:var(--win-grey); border:2px outset #fff; padding: 5px 15px; font-weight: bold; font-size: 14px; cursor: pointer; }
     .btn-taskbar:active { border-style: inset; }
+
+    /* CARRINHO DE MATERIAIS */
+    .cart-controls { display:flex; gap:5px; margin-bottom:10px; }
+    .cart-list { border:2px inset #fff; background:#fff; padding:5px; max-height:200px; overflow-y:auto; font-size:11px; }
+    .cart-item { display:flex; justify-content:space-between; padding:3px; border-bottom:1px dotted #ccc; }
+    .cart-del { color:red; cursor:pointer; font-weight:bold; }
 
   </style>
 </head>
@@ -141,7 +143,7 @@
     
     <div style="background:var(--win-grey); border-top:2px groove #fff; padding:2px 5px; font-size:10px; display:flex; justify-content:space-between;">
       <span>Base Conectada: BASE_DASH_OBRAS</span>
-      <span>Status: Online v6.9</span>
+      <span>Status: Online v7.1</span>
     </div>
   </div>
 
@@ -180,20 +182,26 @@
           <div class="col-right">
             <div class="group-box">
               <div class="group-title">2. APLICAÇÃO DE MATERIAIS E SERVIÇOS</div>
+              
               <div class="cart-controls">
-                <select id="selTipo" onchange="filtrarCatalogo()" style="font-size:11px;">
+                <select id="selTipo" onchange="carregarOpcoes()" style="font-size:11px; width:120px;">
                   <option value="CLIENTE">MATERIAL CLIENTE</option>
                   <option value="PROPRIO">MATERIAL PRÓPRIO</option>
                   <option value="SERVICO">SERVIÇOS</option>
                 </select>
-                <input type="text" id="buscaMat" list="dlMateriais" placeholder="Item..." style="flex:1;">
-                <datalist id="dlMateriais"></datalist>
-                <input type="number" id="qtdMat" value="1" style="width:40px;">
-                <button class="btn-98" onclick="addCart()">ADD</button>
+                <select id="selMaterial" style="font-size:11px; flex:1;">
+                  <option value="">Selecione um item...</option>
+                </select>
+                <input type="number" id="qtdMat" value="1" min="1" style="width:60px; font-size:11px;">
+                <button class="btn-98" onclick="adicionarItem()" style="font-size:11px;">ADD</button>
               </div>
 
-              <div class="cart-list" id="listaCarrinho"></div>
-              <div style="font-size:10px; color:#666;">* Lista será salva no campo Aplicação.</div>
+              <div class="cart-list" id="listaCarrinho">
+                <!-- Itens do carrinho aparecerão aqui -->
+              </div>
+              <div style="font-size:10px; color:#666; margin-top:5px;">
+                * Adicione múltiplos materiais com suas quantidades
+              </div>
             </div>
           </div>
         </div>
@@ -207,21 +215,24 @@
   </div>
 
 <script>
-  // VERIFIQUE SE O LINK ESTÁ CORRETO
+  // CONFIGURAÇÃO
   const API = 'https://script.google.com/macros/s/AKfycbwH6dek08S8I8dpKXWYZR7flENqCXJPqtX-OlJKd9jMuVBYAR1eC5-y-eJ4RztswNQq/exec';
   
-  let CATALOGO = { mat:[], serv:[] };
+  // VARIÁVEIS GLOBAIS
+  let CATALOGO = { materiais: [], servicos: [] };
   let CARRINHO = [];
 
-  // --- FUNÇÕES DE CONTROLE DE JANELA (CORRIGIDAS) ---
+  // ============================================
+  // FUNÇÕES DE CONTROLE DA JANELA
+  // ============================================
   function minimizeApp() {
     document.getElementById('mainApp').style.display = 'none';
-    document.getElementById('taskbarBtn').style.display = 'block'; // Mostra o botão da Taskbar
+    document.getElementById('taskbarBtn').style.display = 'block';
   }
   
   function restoreApp() {
-      document.getElementById('mainApp').style.display = 'flex';
-      document.getElementById('taskbarBtn').style.display = 'none'; // Esconde o botão da Taskbar
+    document.getElementById('mainApp').style.display = 'flex';
+    document.getElementById('taskbarBtn').style.display = 'none';
   }
 
   function toggleMaximize() {
@@ -236,187 +247,311 @@
       app.style.height = '100vh';
     }
   }
+
   function closeApp() {
-    if(confirm("Deseja fechar o Painel Gerencial? Você terá que fazer login novamente.")) {
-        window.close();
+    if(confirm("Deseja fechar o Painel Gerencial?")) {
+      window.close();
     }
   }
+
+  // ============================================
+  // SISTEMA DE LOGIN
+  // ============================================
   function checkLoginState() {
-      // Verifica se o usuário já fez login antes
-      const user = sessionStorage.getItem('usuarioSID');
-      if (user) {
-          document.getElementById('telaLogin').style.display = 'none';
-          document.getElementById('mainApp').style.display = 'flex';
-          document.getElementById('userDisplay').textContent = user;
-          carregarCatalogo(); 
-      }
+    const user = sessionStorage.getItem('usuarioSID');
+    if (user) {
+      document.getElementById('telaLogin').style.display = 'none';
+      document.getElementById('mainApp').style.display = 'flex';
+      document.getElementById('userDisplay').textContent = user;
+      carregarCatalogo();
+    }
   }
 
-  // --- LOGIN ---
   function login() {
     const email = document.getElementById('emailLogin').value;
-    if(!email.includes('@')) return alert('E-mail inválido');
-    jsonp('login', {email:email}, r => {
-      if(r.sucesso) {
-        document.getElementById('telaLogin').style.display = 'none';
-        document.getElementById('mainApp').style.display = 'flex';
-        document.getElementById('userDisplay').textContent = email;
-        sessionStorage.setItem('usuarioSID', email);
-        carregarCatalogo();
-      } else alert(r.msg);
-    });
-  }
-
-  // --- CATÁLOGO ---
-  function carregarCatalogo() {
-    jsonp('listar_catalogos', {}, r => {
-      CATALOGO.mat = r.materiais || [];
-      CATALOGO.serv = r.servicos || [];
-      filtrarCatalogo();
-    });
-  }
-
-  function filtrarCatalogo() {
-    let tipo = document.getElementById('selTipo').value;
-    let dl = document.getElementById('dlMateriais');
-    dl.innerHTML = '';
-    let lista = (tipo === 'SERVICO') ? CATALOGO.serv : CATALOGO.mat.filter(m => m.origem === tipo);
-    lista.forEach(i => {
-      let op = document.createElement('option');
-      op.value = i.desc; op.label = i.cod;
-      dl.appendChild(op);
-    });
-    document.getElementById('buscaMat').value = '';
-  }
-
-  function addCart() {
-    let nome = document.getElementById('buscaMat').value;
-    let qtd = document.getElementById('qtdMat').value;
-    let tipo = document.getElementById('selTipo').value;
-    if(!nome || qtd<=0) return;
-    
-    // Procura o código do material/serviço no datalist antes de adicionar (melhor controle)
-    const datalist = document.getElementById('dlMateriais');
-    let codigo = '';
-    for (let i = 0; i < datalist.options.length; i++) {
-        if (datalist.options[i].value === nome) {
-            codigo = datalist.options[i].label; // O código está no label
-            break;
-        }
+    if(!email.includes('@')) {
+      alert('E-mail inválido');
+      return;
     }
     
-    CARRINHO.push({ tipo, nome, qtd, cod: codigo });
-    renderCart();
-    document.getElementById('buscaMat').value = '';
+    jsonp('login', {email: email}, function(resposta) {
+      if(resposta.sucesso) {
+        document.getElementById('telaLogin').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'flex';
+        sessionStorage.setItem('usuarioSID', email);
+        carregarCatalogo();
+      } else {
+        alert(resposta.msg || 'Erro no login');
+      }
+    });
+  }
+
+  // ============================================
+  // SISTEMA DE CATÁLOGO E CARRINHO (CORRIGIDO)
+  // ============================================
+  function carregarCatalogo() {
+    console.log('Carregando catálogo...');
+    jsonp('listar_catalogos', {}, function(resposta) {
+      console.log('Resposta do catálogo:', resposta);
+      
+      CATALOGO.materiais = resposta.materiais || [];
+      CATALOGO.servicos = resposta.servicos || [];
+      
+      console.log('Materiais carregados:', CATALOGO.materiais.length);
+      console.log('Serviços carregados:', CATALOGO.servicos.length);
+      
+      // Carrega as opções inicialmente
+      carregarOpcoes();
+    });
+  }
+
+  function carregarOpcoes() {
+    const tipo = document.getElementById('selTipo').value;
+    const select = document.getElementById('selMaterial');
+    
+    // Limpa opções anteriores
+    select.innerHTML = '<option value="">Selecione um item...</option>';
+    
+    let lista = [];
+    
+    if (tipo === 'SERVICO') {
+      lista = CATALOGO.servicos;
+    } else {
+      // Filtra materiais por origem
+      lista = CATALOGO.materiais.filter(item => item.origem === tipo);
+    }
+    
+    console.log(`Carregando opções para ${tipo}: ${lista.length} itens`);
+    
+    // Adiciona opções ao select
+    lista.forEach(item => {
+      const option = document.createElement('option');
+      option.value = item.cod;
+      option.textContent = `${item.cod} - ${item.desc} (${item.unid})`;
+      option.setAttribute('data-desc', item.desc);
+      option.setAttribute('data-unid', item.unid);
+      select.appendChild(option);
+    });
+    
+    // Reset quantidade
     document.getElementById('qtdMat').value = 1;
   }
 
-  function renderCart() {
-    let div = document.getElementById('listaCarrinho');
-    div.innerHTML = '';
-    CARRINHO.forEach((item, idx) => {
-      let row = document.createElement('div');
-      row.className = 'cart-item';
-      row.innerHTML = `<span>[${item.tipo}] ${item.qtd}x ${item.nome} (${item.cod})</span> <span class="cart-del" onclick="delCart(${idx})">X</span>`;
-      div.appendChild(row);
+  function adicionarItem() {
+    const tipo = document.getElementById('selTipo').value;
+    const select = document.getElementById('selMaterial');
+    const quantidade = parseInt(document.getElementById('qtdMat').value);
+    
+    if (!select.value) {
+      alert('Selecione um item primeiro!');
+      return;
+    }
+    
+    if (quantidade < 1) {
+      alert('Quantidade deve ser pelo menos 1!');
+      return;
+    }
+    
+    const codigo = select.value;
+    const descricao = select.options[select.selectedIndex].getAttribute('data-desc');
+    const unidade = select.options[select.selectedIndex].getAttribute('data-unid');
+    
+    // Adiciona ao carrinho
+    CARRINHO.push({
+      tipo: tipo,
+      codigo: codigo,
+      descricao: descricao,
+      quantidade: quantidade,
+      unidade: unidade
+    });
+    
+    // Atualiza a exibição do carrinho
+    atualizarCarrinho();
+    
+    // Reseta os campos
+    document.getElementById('qtdMat').value = 1;
+    select.selectedIndex = 0;
+  }
+
+  function removerItem(index) {
+    CARRINHO.splice(index, 1);
+    atualizarCarrinho();
+  }
+
+  function atualizarCarrinho() {
+    const container = document.getElementById('listaCarrinho');
+    container.innerHTML = '';
+    
+    if (CARRINHO.length === 0) {
+      container.innerHTML = '<div style="color:#888; text-align:center; padding:10px;">Nenhum item adicionado</div>';
+      return;
+    }
+    
+    CARRINHO.forEach((item, index) => {
+      const div = document.createElement('div');
+      div.className = 'cart-item';
+      div.innerHTML = `
+        <span>${item.quantidade}x ${item.codigo} - ${item.descricao} (${item.unidade})</span>
+        <span class="cart-del" onclick="removerItem(${index})">X</span>
+      `;
+      container.appendChild(div);
     });
   }
 
-  function delCart(idx) { CARRINHO.splice(idx, 1); renderCart(); }
-
-  // --- BUSCA E MODAL ---
+  // ============================================
+  // SISTEMA DE BUSCA E EDIÇÃO
+  // ============================================
   function buscar() {
-    let t = document.getElementById('termo').value;
-    if(!t) return;
-    document.getElementById('tbResult').querySelector('tbody').innerHTML = '<tr><td colspan="9">Buscando...</td></tr>';
-    jsonp('resolver_obra', {termo:t}, r => {
-      let tb = document.getElementById('tbResult').querySelector('tbody');
-      tb.innerHTML = '';
-      if(!r.obras.length) return tb.innerHTML='<tr><td colspan="9">Nada encontrado.</td></tr>';
-      r.obras.forEach(o => {
-        let safe = encodeURIComponent(JSON.stringify(o));
-        let corStatus = "#eee";
-        if(o.STATUS.includes("PENDENTE")) corStatus = "#ffff99";
-        if(o.STATUS.includes("CONCLUÍDO")) corStatus = "#99ff99";
+    const termo = document.getElementById('termo').value.trim();
+    if (!termo) return;
+    
+    const tbody = document.getElementById('tbResult').querySelector('tbody');
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px;">Buscando...</td></tr>';
+    
+    jsonp('resolver_obra', {termo: termo}, function(resposta) {
+      tbody.innerHTML = '';
+      
+      if (!resposta.obras || resposta.obras.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px;">Nenhuma obra encontrada</td></tr>';
+        return;
+      }
+      
+      resposta.obras.forEach(obra => {
+        const safeData = encodeURIComponent(JSON.stringify(obra));
         
-        let txtMas = (o.MASCARA_BA||'').substring(0,25) + '...';
-        let txtApl = (o.APLICACAO_FEITA||'').substring(0,25) + '...';
-        let txtPen = (o.PENDENCIA_DEVOLUCAO||'').substring(0,25) + '...';
-
-        tb.innerHTML += `<tr>
-          <td><b>${o.COD_OBRA_NUM}</b></td>
-          <td>${o.OPERADORA}</td>
-          <td>${o.DESCRICAO}</td>
-          <td><span class="status-badge" style="background:${corStatus}">${o.STATUS}</span></td>
-          <td>${o.SUPERVISOR}</td>
-          <td style="color:#000080;font-size:10px;">${txtMas}</td>
-          <td style="font-size:10px;">${txtApl}</td>
-          <td style="color:red;font-weight:bold;font-size:10px;">${txtPen}</td>
-          <td style="text-align:center">
-            <button class="btn-98" onclick="openModal('${safe}')">📝 ABRIR</button>
-            <button class="btn-98" onclick="alert('Funcionalidade Detalhar em construção.')">Detalhar</button>
-          </td>
-        </tr>`;
+        // Determina cor do status
+        let corStatus = "#eee";
+        if (obra.STATUS && obra.STATUS.includes("PENDENTE")) corStatus = "#ffff99";
+        if (obra.STATUS && obra.STATUS.includes("CONCLUÍDO")) corStatus = "#99ff99";
+        
+        // Prepara textos curtos para exibição
+        const txtMascara = (obra.MASCARA_BA || '').substring(0, 25) + (obra.MASCARA_BA && obra.MASCARA_BA.length > 25 ? '...' : '');
+        const txtAplicacao = (obra.APLICACAO_FEITA || '').substring(0, 25) + (obra.APLICACAO_FEITA && obra.APLICACAO_FEITA.length > 25 ? '...' : '');
+        const txtPendencia = (obra.PENDENCIA_DEVOLUCAO || '').substring(0, 25) + (obra.PENDENCIA_DEVOLUCAO && obra.PENDENCIA_DEVOLUCAO.length > 25 ? '...' : '');
+        
+        // Cria a linha da tabela
+        const linha = `
+          <tr>
+            <td><b>${obra.COD_OBRA_NUM || ''}</b></td>
+            <td>${obra.OPERADORA || ''}</td>
+            <td>${obra.DESCRICAO || ''}</td>
+            <td><span class="status-badge" style="background:${corStatus}">${obra.STATUS || ''}</span></td>
+            <td>${obra.SUPERVISOR || ''}</td>
+            <td style="color:#000080; font-size:10px;">${txtMascara}</td>
+            <td style="font-size:10px;">${txtAplicacao}</td>
+            <td style="color:red; font-weight:bold; font-size:10px;">${txtPendencia}</td>
+            <td style="text-align:center">
+              <button class="btn-98" onclick="abrirModal('${safeData}')">📝 ABRIR</button>
+            </td>
+          </tr>
+        `;
+        
+        tbody.innerHTML += linha;
       });
     });
   }
 
-  function openModal(safe) {
-    let o = JSON.parse(decodeURIComponent(safe));
-    document.getElementById('hdnCod').value = o.COD_OBRA_NUM;
-    document.getElementById('vID').textContent = o.COD_OBRA_NUM;
-    document.getElementById('vDesc').textContent = o.DESCRICAO;
-    document.getElementById('vOp').textContent = o.OPERADORA;
-    document.getElementById('vSt').textContent = o.STATUS;
-    document.getElementById('vSup').textContent = o.SUPERVISOR;
+  function abrirModal(dadosCodificados) {
+    const obra = JSON.parse(decodeURIComponent(dadosCodificados));
     
-    document.getElementById('txtMas').value = o.MASCARA_BA || '';
-    document.getElementById('txtPen').value = o.PENDENCIA_DEVOLUCAO || '';
+    // Preenche informações básicas
+    document.getElementById('hdnCod').value = obra.COD_OBRA_NUM;
+    document.getElementById('vID').textContent = obra.COD_OBRA_NUM || '-';
+    document.getElementById('vDesc').textContent = obra.DESCRICAO || '-';
+    document.getElementById('vOp').textContent = obra.OPERADORA || '-';
+    document.getElementById('vSt').textContent = obra.STATUS || '-';
+    document.getElementById('vSup').textContent = obra.SUPERVISOR || '-';
     
+    // Preenche campos de texto
+    document.getElementById('txtMas').value = obra.MASCARA_BA || '';
+    document.getElementById('txtPen').value = obra.PENDENCIA_DEVOLUCAO || '';
+    
+    // Processa carrinho a partir da aplicação salva
     CARRINHO = [];
-    if(o.APLICACAO_FEITA) {
-      let itens = o.APLICACAO_FEITA.split('|');
-      itens.forEach(i => {
-        let match = i.trim().match(/\[(.*?)\] (\d+)x (.*?) (\((.*?)\))?$/);
-        if(match) CARRINHO.push({ tipo:match[1], qtd:match[2], nome:match[3], cod:match[5] || '' });
-        else if(i.trim()) CARRINHO.push({ tipo:'TXT', qtd:1, nome:i.trim() });
+    if (obra.APLICACAO_FEITA && obra.APLICACAO_FEITA.trim() !== '') {
+      const itens = obra.APLICACAO_FEITA.split('|').map(item => item.trim()).filter(item => item !== '');
+      
+      itens.forEach(item => {
+        // Tenta extrair informações do formato salvo
+        const match = item.match(/(\d+)x\s+(.+?)\s+\((.*?)\)/);
+        if (match) {
+          CARRINHO.push({
+            quantidade: parseInt(match[1]),
+            descricao: match[2],
+            codigo: match[3],
+            tipo: 'MATERIAL',
+            unidade: 'UN'
+          });
+        }
       });
     }
-    renderCart();
+    
+    atualizarCarrinho();
     document.getElementById('modalEdicao').style.display = 'flex';
   }
 
-  function closeModal() { document.getElementById('modalEdicao').style.display = 'none'; }
+  function closeModal() {
+    document.getElementById('modalEdicao').style.display = 'none';
+    CARRINHO = [];
+  }
 
   function salvar() {
-    let cod = document.getElementById('hdnCod').value;
-    let mas = document.getElementById('txtMas').value;
-    let pen = document.getElementById('txtPen').value;
+    const codObra = document.getElementById('hdnCod').value;
+    const mascara = document.getElementById('txtMas').value;
+    const pendencia = document.getElementById('txtPen').value;
     
-    // Converte Carrinho para String formatada [TIPO] QTDx NOME (COD)
-    let aplTexto = CARRINHO.map(i => {
-        let nome = i.nome.trim();
-        let codDisplay = i.cod ? ` (${i.cod})` : '';
-        return `[${i.tipo}] ${i.qtd}x ${nome}${codDisplay}`;
-    }).join(' | ');
-
-    let btn = document.querySelector('.modal-content .primary');
-    let txt = btn.textContent; btn.textContent="..."; btn.disabled=true;
-
-    jsonp('atualizar_anotacoes_obra', {codObra:cod, mascaraBa:mas, aplicacaoFeita:aplTexto, pendencia:pen}, r => {
-      btn.textContent=txt; btn.disabled=false;
-      if(r.sucesso) { alert('Salvo!'); closeModal(); buscar(); }
-      else alert(r.mensagem);
+    // Converte carrinho para texto de aplicação
+    let aplicacaoTexto = '';
+    if (CARRINHO.length > 0) {
+      aplicacaoTexto = CARRINHO.map(item => {
+        return `${item.quantidade}x ${item.descricao} (${item.codigo})`;
+      }).join(' | ');
+    }
+    
+    // Botão de salvar
+    const btnSalvar = document.querySelector('.modal-content .primary');
+    const textoOriginal = btnSalvar.textContent;
+    btnSalvar.textContent = 'Salvando...';
+    btnSalvar.disabled = true;
+    
+    jsonp('atualizar_anotacoes_obra', {
+      codObra: codObra,
+      mascaraBa: mascara,
+      aplicacaoFeita: aplicacaoTexto,
+      pendencia: pendencia
+    }, function(resposta) {
+      btnSalvar.textContent = textoOriginal;
+      btnSalvar.disabled = false;
+      
+      if (resposta.sucesso) {
+        alert('Dados salvos com sucesso!');
+        closeModal();
+        buscar(); // Atualiza a lista
+      } else {
+        alert('Erro ao salvar: ' + (resposta.mensagem || 'Erro desconhecido'));
+      }
     });
   }
 
-  function jsonp(acao, params, cb) {
-    let n = 'cb_'+Date.now();
-    window[n] = (r) => { delete window[n]; document.body.removeChild(s); cb(r); };
-    let q = Object.keys(params).map(k=>k+'='+encodeURIComponent(params[k])).join('&');
-    let s = document.createElement('script');
-    s.src = API + '?acao='+acao+'&callback='+n+(q?'&'+q:'');
-    document.body.appendChild(s);
+  // ============================================
+  // FUNÇÃO JSONP PARA COMUNICAÇÃO
+  // ============================================
+  function jsonp(acao, params, callback) {
+    const nomeCallback = 'callback_' + Date.now() + '_' + Math.random().toString(36).substr(2);
+    
+    window[nomeCallback] = function(resposta) {
+      delete window[nomeCallback];
+      document.body.removeChild(script);
+      callback(resposta);
+    };
+    
+    const parametros = new URLSearchParams(params);
+    parametros.set('acao', acao);
+    parametros.set('callback', nomeCallback);
+    
+    const script = document.createElement('script');
+    script.src = API + '?' + parametros.toString();
+    document.body.appendChild(script);
   }
 </script>
 </body>
