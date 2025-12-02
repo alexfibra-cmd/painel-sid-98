@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>SID 98 - Enterprise (v7.1 Final)</title>
+  <title>SID 98 - Enterprise (v7.2 - Busca Rápida)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     /* --- CORE WINDOWS 98 STYLES --- */
@@ -55,11 +55,41 @@
     .btn-taskbar { background:var(--win-grey); border:2px outset #fff; padding: 5px 15px; font-weight: bold; font-size: 14px; cursor: pointer; }
     .btn-taskbar:active { border-style: inset; }
 
-    /* CARRINHO DE MATERIAIS */
-    .cart-controls { display:flex; gap:5px; margin-bottom:10px; }
+    /* CARRINHO DE MATERIAIS - NOVO DESIGN */
+    .cart-controls { display:flex; flex-direction:column; gap:5px; margin-bottom:10px; }
+    .search-box { display:flex; gap:5px; }
+    .search-box input { flex:1; padding:4px; font-size:11px; border:2px inset #fff; }
+    .type-selector { display:flex; gap:5px; }
+    .type-selector select { flex:1; padding:4px; font-size:11px; border:2px outset #fff; }
+    .item-selector { display:flex; gap:5px; }
+    .item-selector select { flex:1; padding:4px; font-size:11px; border:2px outset #fff; }
+    .quantity-controls { display:flex; gap:5px; align-items:center; }
+    .quantity-controls input { width:50px; padding:4px; font-size:11px; border:2px inset #fff; text-align:center; }
+    
     .cart-list { border:2px inset #fff; background:#fff; padding:5px; max-height:200px; overflow-y:auto; font-size:11px; }
     .cart-item { display:flex; justify-content:space-between; padding:3px; border-bottom:1px dotted #ccc; }
-    .cart-del { color:red; cursor:pointer; font-weight:bold; }
+    .cart-del { color:red; cursor:pointer; font-weight:bold; padding:0 5px; }
+
+    /* SUGESTÕES DE BUSCA */
+    .suggestions-box { 
+      position: absolute; 
+      background: white; 
+      border: 2px outset #fff; 
+      max-height: 150px; 
+      overflow-y: auto; 
+      z-index: 1000; 
+      display: none;
+      font-size: 11px;
+    }
+    .suggestion-item { 
+      padding: 5px; 
+      cursor: pointer; 
+      border-bottom: 1px solid #eee; 
+    }
+    .suggestion-item:hover { 
+      background: #000080; 
+      color: white; 
+    }
 
   </style>
 </head>
@@ -92,7 +122,7 @@
       <div class="sidebar">
         <div style="border:2px groove #fff; padding:5px; margin-bottom:5px;">
           <input type="text" id="termo" placeholder="ID ou Nome..." style="width:100%; padding:3px;" onkeydown="if(event.key=='Enter') buscar()">
-          <button class="btn-98" style="width:100%; margin-top:4px;" onclick="buscar()">🔎 Localizar</button>
+          <button class="btn-98" style="width:100%; margin-top:4px;" onclick="buscar()">🔎 Localizar Obra</button>
         </div>
 
         <button class="btn-98 nav-btn active" onclick="alert('Módulo Ativo')">
@@ -143,7 +173,7 @@
     
     <div style="background:var(--win-grey); border-top:2px groove #fff; padding:2px 5px; font-size:10px; display:flex; justify-content:space-between;">
       <span>Base Conectada: BASE_DASH_OBRAS</span>
-      <span>Status: Online v7.1</span>
+      <span>Status: Online v7.2</span>
     </div>
   </div>
 
@@ -183,24 +213,43 @@
             <div class="group-box">
               <div class="group-title">2. APLICAÇÃO DE MATERIAIS E SERVIÇOS</div>
               
+              <!-- NOVO SISTEMA DE BUSCA RÁPIDA -->
               <div class="cart-controls">
-                <select id="selTipo" onchange="carregarOpcoes()" style="font-size:11px; width:120px;">
-                  <option value="CLIENTE">MATERIAL CLIENTE</option>
-                  <option value="PROPRIO">MATERIAL PRÓPRIO</option>
-                  <option value="SERVICO">SERVIÇOS</option>
-                </select>
-                <select id="selMaterial" style="font-size:11px; flex:1;">
-                  <option value="">Selecione um item...</option>
-                </select>
-                <input type="number" id="qtdMat" value="1" min="1" style="width:60px; font-size:11px;">
-                <button class="btn-98" onclick="adicionarItem()" style="font-size:11px;">ADD</button>
+                <div class="type-selector">
+                  <select id="selTipo" onchange="carregarOpcoes()" style="font-size:11px;">
+                    <option value="CLIENTE">MATERIAL CLIENTE</option>
+                    <option value="PROPRIO">MATERIAL PRÓPRIO</option>
+                    <option value="SERVICO">SERVIÇOS</option>
+                  </select>
+                </div>
+                
+                <div class="search-box">
+                  <input type="text" id="buscaRapida" 
+                         placeholder="🔍 Buscar por código ou descrição..." 
+                         style="flex:1; padding:4px;"
+                         onkeyup="filtrarOpcoes()"
+                         onfocus="mostrarSugestoes()">
+                  <div id="sugestoesBox" class="suggestions-box"></div>
+                </div>
+                
+                <div class="item-selector">
+                  <select id="selMaterial" size="5" style="flex:1; font-size:11px;">
+                    <option value="">Selecione um item...</option>
+                  </select>
+                </div>
+                
+                <div class="quantity-controls">
+                  <span style="font-size:11px;">Qtd:</span>
+                  <input type="number" id="qtdMat" value="1" min="1" max="999" style="width:60px;">
+                  <button class="btn-98" onclick="adicionarItem()" style="font-size:11px; padding:4px 8px;">➕ ADD</button>
+                </div>
               </div>
 
               <div class="cart-list" id="listaCarrinho">
                 <!-- Itens do carrinho aparecerão aqui -->
               </div>
               <div style="font-size:10px; color:#666; margin-top:5px;">
-                * Adicione múltiplos materiais com suas quantidades
+                💡 <b>Dica:</b> Digite parte do código ou nome para buscar rapidamente
               </div>
             </div>
           </div>
@@ -221,6 +270,8 @@
   // VARIÁVEIS GLOBAIS
   let CATALOGO = { materiais: [], servicos: [] };
   let CARRINHO = [];
+  let TODOS_ITENS = []; // Para busca rápida
+  let ITENS_FILTRADOS = [];
 
   // ============================================
   // FUNÇÕES DE CONTROLE DA JANELA
@@ -287,7 +338,7 @@
   }
 
   // ============================================
-  // SISTEMA DE CATÁLOGO E CARRINHO (CORRIGIDO)
+  // SISTEMA DE CATÁLOGO COM BUSCA RÁPIDA
   // ============================================
   function carregarCatalogo() {
     console.log('Carregando catálogo...');
@@ -297,10 +348,35 @@
       CATALOGO.materiais = resposta.materiais || [];
       CATALOGO.servicos = resposta.servicos || [];
       
-      console.log('Materiais carregados:', CATALOGO.materiais.length);
-      console.log('Serviços carregados:', CATALOGO.servicos.length);
+      // Prepara lista completa para busca
+      TODOS_ITENS = [];
       
-      // Carrega as opções inicialmente
+      // Adiciona materiais
+      CATALOGO.materiais.forEach(item => {
+        TODOS_ITENS.push({
+          tipo: item.origem,
+          codigo: item.cod,
+          descricao: item.desc,
+          unidade: item.unid,
+          categoria: 'MATERIAL'
+        });
+      });
+      
+      // Adiciona serviços
+      CATALOGO.servicos.forEach(item => {
+        TODOS_ITENS.push({
+          tipo: 'SERVICO',
+          codigo: item.cod,
+          descricao: item.desc,
+          unidade: item.unid || 'UN',
+          categoria: 'SERVICO'
+        });
+      });
+      
+      console.log('Total de itens carregados:', TODOS_ITENS.length);
+      console.log('Materiais:', CATALOGO.materiais.length);
+      console.log('Serviços:', CATALOGO.servicos.length);
+      
       carregarOpcoes();
     });
   }
@@ -309,54 +385,173 @@
     const tipo = document.getElementById('selTipo').value;
     const select = document.getElementById('selMaterial');
     
-    // Limpa opções anteriores
-    select.innerHTML = '<option value="">Selecione um item...</option>';
+    select.innerHTML = '';
     
-    let lista = [];
+    // Filtra itens pelo tipo selecionado
+    ITENS_FILTRADOS = TODOS_ITENS.filter(item => {
+      if (tipo === 'SERVICO') {
+        return item.categoria === 'SERVICO';
+      } else {
+        return item.tipo === tipo;
+      }
+    });
     
-    if (tipo === 'SERVICO') {
-      lista = CATALOGO.servicos;
-    } else {
-      // Filtra materiais por origem
-      lista = CATALOGO.materiais.filter(item => item.origem === tipo);
-    }
+    console.log(`Carregando ${ITENS_FILTRADOS.length} itens para ${tipo}`);
     
-    console.log(`Carregando opções para ${tipo}: ${lista.length} itens`);
+    // Ordena por código
+    ITENS_FILTRADOS.sort((a, b) => a.codigo.localeCompare(b.codigo));
     
-    // Adiciona opções ao select
-    lista.forEach(item => {
+    // Adiciona ao select
+    ITENS_FILTRADOS.forEach(item => {
       const option = document.createElement('option');
-      option.value = item.cod;
-      option.textContent = `${item.cod} - ${item.desc} (${item.unid})`;
-      option.setAttribute('data-desc', item.desc);
-      option.setAttribute('data-unid', item.unid);
+      option.value = item.codigo;
+      option.textContent = `${item.codigo} - ${item.descricao} (${item.unidade})`;
+      option.setAttribute('data-desc', item.descricao);
+      option.setAttribute('data-unid', item.unidade);
+      option.setAttribute('data-tipo', item.tipo);
       select.appendChild(option);
     });
     
-    // Reset quantidade
+    // Seleciona primeiro item se houver
+    if (ITENS_FILTRADOS.length > 0) {
+      select.selectedIndex = 0;
+    }
+    
     document.getElementById('qtdMat').value = 1;
+    document.getElementById('buscaRapida').value = '';
+    document.getElementById('sugestoesBox').style.display = 'none';
   }
 
+  // FUNÇÃO DE BUSCA RÁPIDA
+  function filtrarOpcoes() {
+    const termo = document.getElementById('buscaRapida').value.toUpperCase().trim();
+    const select = document.getElementById('selMaterial');
+    const tipoAtual = document.getElementById('selTipo').value;
+    
+    if (!termo) {
+      carregarOpcoes();
+      document.getElementById('sugestoesBox').style.display = 'none';
+      return;
+    }
+    
+    // Filtra itens
+    const resultados = TODOS_ITENS.filter(item => {
+      const filtroTipo = tipoAtual === 'SERVICO' ? item.categoria === 'SERVICO' : item.tipo === tipoAtual;
+      const buscaCodigo = item.codigo.toUpperCase().includes(termo);
+      const buscaDescricao = item.descricao.toUpperCase().includes(termo);
+      
+      return filtroTipo && (buscaCodigo || buscaDescricao);
+    });
+    
+    // Atualiza select
+    select.innerHTML = '';
+    resultados.forEach(item => {
+      const option = document.createElement('option');
+      option.value = item.codigo;
+      option.textContent = `${item.codigo} - ${item.descricao} (${item.unidade})`;
+      option.setAttribute('data-desc', item.descricao);
+      option.setAttribute('data-unid', item.unidade);
+      option.setAttribute('data-tipo', item.tipo);
+      select.appendChild(option);
+    });
+    
+    // Mostra sugestões
+    mostrarSugestoes(termo);
+    
+    // Seleciona primeiro item se houver
+    if (resultados.length > 0) {
+      select.selectedIndex = 0;
+    }
+  }
+
+  // MOSTRAR SUGESTÕES DE BUSCA
+  function mostrarSugestoes(termo) {
+    const input = document.getElementById('buscaRapida');
+    const box = document.getElementById('sugestoesBox');
+    const tipoAtual = document.getElementById('selTipo').value;
+    
+    if (!input.value.trim()) {
+      box.style.display = 'none';
+      return;
+    }
+    
+    termo = termo || input.value.toUpperCase().trim();
+    
+    // Filtra sugestões
+    const sugestoes = TODOS_ITENS.filter(item => {
+      const filtroTipo = tipoAtual === 'SERVICO' ? item.categoria === 'SERVICO' : item.tipo === tipoAtual;
+      const buscaCodigo = item.codigo.toUpperCase().includes(termo);
+      const buscaDescricao = item.descricao.toUpperCase().includes(termo);
+      
+      return filtroTipo && (buscaCodigo || buscaDescricao);
+    }).slice(0, 10); // Limita a 10 sugestões
+    
+    if (sugestoes.length === 0) {
+      box.style.display = 'none';
+      return;
+    }
+    
+    // Posiciona a caixa de sugestões
+    const rect = input.getBoundingClientRect();
+    box.style.position = 'fixed';
+    box.style.left = rect.left + 'px';
+    box.style.top = (rect.bottom + window.scrollY) + 'px';
+    box.style.width = rect.width + 'px';
+    
+    // Preenche sugestões
+    box.innerHTML = '';
+    sugestoes.forEach((item, index) => {
+      const div = document.createElement('div');
+      div.className = 'suggestion-item';
+      div.textContent = `${item.codigo} - ${item.descricao}`;
+      div.onclick = function() {
+        input.value = item.codigo;
+        box.style.display = 'none';
+        
+        // Seleciona o item no select
+        const select = document.getElementById('selMaterial');
+        for (let i = 0; i < select.options.length; i++) {
+          if (select.options[i].value === item.codigo) {
+            select.selectedIndex = i;
+            break;
+          }
+        }
+      };
+      box.appendChild(div);
+    });
+    
+    box.style.display = 'block';
+  }
+
+  // ESCONDER SUGESTÕES AO CLICAR FORA
+  document.addEventListener('click', function(e) {
+    const box = document.getElementById('sugestoesBox');
+    const input = document.getElementById('buscaRapida');
+    
+    if (box && !box.contains(e.target) && e.target !== input) {
+      box.style.display = 'none';
+    }
+  });
+
   function adicionarItem() {
-    const tipo = document.getElementById('selTipo').value;
     const select = document.getElementById('selMaterial');
     const quantidade = parseInt(document.getElementById('qtdMat').value);
     
-    if (!select.value) {
+    if (!select.value || select.selectedIndex === -1) {
       alert('Selecione um item primeiro!');
       return;
     }
     
-    if (quantidade < 1) {
-      alert('Quantidade deve ser pelo menos 1!');
+    if (quantidade < 1 || quantidade > 999) {
+      alert('Quantidade deve ser entre 1 e 999!');
       return;
     }
     
     const codigo = select.value;
     const descricao = select.options[select.selectedIndex].getAttribute('data-desc');
     const unidade = select.options[select.selectedIndex].getAttribute('data-unid');
+    const tipo = select.options[select.selectedIndex].getAttribute('data-tipo') || document.getElementById('selTipo').value;
     
-    // Adiciona ao carrinho
     CARRINHO.push({
       tipo: tipo,
       codigo: codigo,
@@ -365,12 +560,14 @@
       unidade: unidade
     });
     
-    // Atualiza a exibição do carrinho
     atualizarCarrinho();
     
-    // Reseta os campos
     document.getElementById('qtdMat').value = 1;
-    select.selectedIndex = 0;
+    document.getElementById('buscaRapida').value = '';
+    document.getElementById('sugestoesBox').style.display = 'none';
+    
+    // Volta para lista completa
+    carregarOpcoes();
   }
 
   function removerItem(index) {
@@ -391,8 +588,8 @@
       const div = document.createElement('div');
       div.className = 'cart-item';
       div.innerHTML = `
-        <span>${item.quantidade}x ${item.codigo} - ${item.descricao} (${item.unidade})</span>
-        <span class="cart-del" onclick="removerItem(${index})">X</span>
+        <span><b>${item.quantidade}x</b> [${item.tipo}] ${item.codigo} - ${item.descricao} (${item.unidade})</span>
+        <span class="cart-del" onclick="removerItem(${index})" title="Remover">✖</span>
       `;
       container.appendChild(div);
     });
@@ -419,17 +616,14 @@
       resposta.obras.forEach(obra => {
         const safeData = encodeURIComponent(JSON.stringify(obra));
         
-        // Determina cor do status
         let corStatus = "#eee";
         if (obra.STATUS && obra.STATUS.includes("PENDENTE")) corStatus = "#ffff99";
         if (obra.STATUS && obra.STATUS.includes("CONCLUÍDO")) corStatus = "#99ff99";
         
-        // Prepara textos curtos para exibição
         const txtMascara = (obra.MASCARA_BA || '').substring(0, 25) + (obra.MASCARA_BA && obra.MASCARA_BA.length > 25 ? '...' : '');
         const txtAplicacao = (obra.APLICACAO_FEITA || '').substring(0, 25) + (obra.APLICACAO_FEITA && obra.APLICACAO_FEITA.length > 25 ? '...' : '');
         const txtPendencia = (obra.PENDENCIA_DEVOLUCAO || '').substring(0, 25) + (obra.PENDENCIA_DEVOLUCAO && obra.PENDENCIA_DEVOLUCAO.length > 25 ? '...' : '');
         
-        // Cria a linha da tabela
         const linha = `
           <tr>
             <td><b>${obra.COD_OBRA_NUM || ''}</b></td>
@@ -454,7 +648,6 @@
   function abrirModal(dadosCodificados) {
     const obra = JSON.parse(decodeURIComponent(dadosCodificados));
     
-    // Preenche informações básicas
     document.getElementById('hdnCod').value = obra.COD_OBRA_NUM;
     document.getElementById('vID').textContent = obra.COD_OBRA_NUM || '-';
     document.getElementById('vDesc').textContent = obra.DESCRICAO || '-';
@@ -462,24 +655,21 @@
     document.getElementById('vSt').textContent = obra.STATUS || '-';
     document.getElementById('vSup').textContent = obra.SUPERVISOR || '-';
     
-    // Preenche campos de texto
     document.getElementById('txtMas').value = obra.MASCARA_BA || '';
     document.getElementById('txtPen').value = obra.PENDENCIA_DEVOLUCAO || '';
     
-    // Processa carrinho a partir da aplicação salva
     CARRINHO = [];
     if (obra.APLICACAO_FEITA && obra.APLICACAO_FEITA.trim() !== '') {
       const itens = obra.APLICACAO_FEITA.split('|').map(item => item.trim()).filter(item => item !== '');
       
       itens.forEach(item => {
-        // Tenta extrair informações do formato salvo
-        const match = item.match(/(\d+)x\s+(.+?)\s+\((.*?)\)/);
+        const match = item.match(/\[(.*?)\]\s*(\d+)x\s+(.+?)\s+\((.*?)\)/);
         if (match) {
           CARRINHO.push({
-            quantidade: parseInt(match[1]),
-            descricao: match[2],
-            codigo: match[3],
-            tipo: 'MATERIAL',
+            tipo: match[1],
+            quantidade: parseInt(match[2]),
+            descricao: match[3],
+            codigo: match[4],
             unidade: 'UN'
           });
         }
@@ -488,6 +678,11 @@
     
     atualizarCarrinho();
     document.getElementById('modalEdicao').style.display = 'flex';
+    
+    // Foca no campo de busca
+    setTimeout(() => {
+      document.getElementById('buscaRapida').focus();
+    }, 100);
   }
 
   function closeModal() {
@@ -500,18 +695,20 @@
     const mascara = document.getElementById('txtMas').value;
     const pendencia = document.getElementById('txtPen').value;
     
-    // Converte carrinho para texto de aplicação
     let aplicacaoTexto = '';
     if (CARRINHO.length > 0) {
       aplicacaoTexto = CARRINHO.map(item => {
-        return `${item.quantidade}x ${item.descricao} (${item.codigo})`;
+        return `[${item.tipo}] ${item.quantidade}x ${item.descricao} (${item.codigo})`;
       }).join(' | ');
     }
     
-    // Botão de salvar
+    console.log('=== SALVANDO DADOS ===');
+    console.log('Obra:', codObra);
+    console.log('Aplicação:', aplicacaoTexto);
+    
     const btnSalvar = document.querySelector('.modal-content .primary');
     const textoOriginal = btnSalvar.textContent;
-    btnSalvar.textContent = 'Salvando...';
+    btnSalvar.textContent = '💾 Salvando...';
     btnSalvar.disabled = true;
     
     jsonp('atualizar_anotacoes_obra', {
@@ -524,11 +721,11 @@
       btnSalvar.disabled = false;
       
       if (resposta.sucesso) {
-        alert('Dados salvos com sucesso!');
+        alert('✅ Dados salvos com sucesso!');
         closeModal();
-        buscar(); // Atualiza a lista
+        buscar();
       } else {
-        alert('Erro ao salvar: ' + (resposta.mensagem || 'Erro desconhecido'));
+        alert('❌ Erro: ' + (resposta.mensagem || 'Falha ao salvar'));
       }
     });
   }
