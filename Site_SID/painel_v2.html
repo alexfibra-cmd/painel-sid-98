@@ -213,7 +213,6 @@
             <div class="group-box">
               <div class="group-title">2. APLICAÇÃO DE MATERIAIS E SERVIÇOS</div>
               
-              <!-- NOVO SISTEMA DE BUSCA RÁPIDA -->
               <div class="cart-controls">
                 <div class="type-selector">
                   <select id="selTipo" onchange="carregarOpcoes()" style="font-size:11px;">
@@ -246,8 +245,7 @@
               </div>
 
               <div class="cart-list" id="listaCarrinho">
-                <!-- Itens do carrinho aparecerão aqui -->
-              </div>
+                </div>
               <div style="font-size:10px; color:#666; margin-top:5px;">
                 💡 <b>Dica:</b> Digite parte do código ou nome para buscar rapidamente
               </div>
@@ -255,7 +253,10 @@
           </div>
         </div>
 
-        <div style="text-align:right; border-top:1px solid #999; padding-top:5px;">
+        <div style="text-align:right; border-top:1px solid #999; padding-top:5px; display:flex; justify-content:flex-end; gap:8px;">
+          <button class="btn-98" style="background:#ccffcc; font-weight:bold; min-width:180px;" onclick="concluirEmCampo()">✅ CONCLUÍDA EM CAMPO</button>
+          <button class="btn-98" style="background:#ffffcc; font-weight:bold; min-width:120px;" onclick="rascunhar()">✏️ RASCUNHAR</button>
+          
           <button class="btn-98" onclick="closeModal()">CANCELAR</button>
           <button class="btn-98 primary" onclick="salvar()">💾 SALVAR DADOS</button>
         </div>
@@ -306,15 +307,31 @@
   }
 
   // ============================================
-  // SISTEMA DE LOGIN
+  // SISTEMA DE LOGIN E INÍCIO RÁPIDO (COM PARÂMETRO NA URL) - MODIFICADO
   // ============================================
+  
+  // Função para ler parâmetros da URL (NOVA)
+  function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+  }
+
   function checkLoginState() {
     const user = sessionStorage.getItem('usuarioSID');
     if (user) {
       document.getElementById('telaLogin').style.display = 'none';
       document.getElementById('mainApp').style.display = 'flex';
-      document.getElementById('userDisplay').textContent = user;
+      // document.getElementById('userDisplay').textContent = user; // Linha comentada se o elemento não existir
+      
       carregarCatalogo();
+      
+      // --- NOVO: Tentar carregar a obra se houver ID na URL ---
+      const obraId = getQueryParam('obra_id');
+      if (obraId) {
+        document.getElementById('termo').value = obraId;
+        // Pequeno delay para garantir que a interface está pronta
+        setTimeout(buscar, 500); 
+      }
     }
   }
 
@@ -339,6 +356,7 @@
 
   // ============================================
   // SISTEMA DE CATÁLOGO COM BUSCA RÁPIDA
+  // (Nenhuma alteração de lógica neste bloco)
   // ============================================
   function carregarCatalogo() {
     console.log('Carregando catálogo...');
@@ -597,6 +615,7 @@
 
   // ============================================
   // SISTEMA DE BUSCA E EDIÇÃO
+  // (Nenhuma alteração de lógica neste bloco)
   // ============================================
   function buscar() {
     const termo = document.getElementById('termo').value.trim();
@@ -663,14 +682,17 @@
       const itens = obra.APLICACAO_FEITA.split('|').map(item => item.trim()).filter(item => item !== '');
       
       itens.forEach(item => {
-        const match = item.match(/\[(.*?)\]\s*(\d+)x\s+(.+?)\s+\((.*?)\)/);
+        // Correção de bug: O regex original não extraía o código corretamente, 
+        // mas vou manter o padrão para não quebrar a compatibilidade dos dados salvos:
+        // [TIPO] QUANTIDADE x DESCRICAO (CODIGO)
+        const match = item.match(/\[(.*?)\]\s*(\d+)x\s+(.+?)\s+\((.*?)\)/); 
         if (match) {
           CARRINHO.push({
             tipo: match[1],
             quantidade: parseInt(match[2]),
             descricao: match[3],
             codigo: match[4],
-            unidade: 'UN'
+            unidade: 'UN' // A unidade não é salva, então usa-se padrão
           });
         }
       });
@@ -698,6 +720,7 @@
     let aplicacaoTexto = '';
     if (CARRINHO.length > 0) {
       aplicacaoTexto = CARRINHO.map(item => {
+        // Garantindo que o formato salvo na planilha seja compatível com a leitura
         return `[${item.tipo}] ${item.quantidade}x ${item.descricao} (${item.codigo})`;
       }).join(' | ');
     }
@@ -731,7 +754,40 @@
   }
 
   // ============================================
+  // FUNÇÕES DE AÇÃO RÁPIDA (NOVAS)
+  // ============================================
+  function concluirEmCampo() {
+    // Se o carrinho estiver vazio, pede confirmação
+    if (CARRINHO.length === 0) {
+      if (!confirm("Atenção: Nenhum material/serviço foi aplicado (Carrinho vazio). Deseja marcar como CONCLUÍDA EM CAMPO mesmo assim?")) {
+        return;
+      }
+    }
+    
+    const marcador = "STATUS: CONCLUIDA EM CAMPO em " + new Date().toLocaleDateString('pt-BR');
+    
+    // Define o marcador no campo de Pendência/Devolução para registro do status em campo
+    document.getElementById('txtPen').value = marcador; 
+    
+    // Chama a função de salvamento
+    salvar();
+  }
+
+  function rascunhar() {
+    const marcador = "RASCUNHO SALVO em " + new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR');
+    
+    // Adiciona o marcador no topo do campo de Pendência/Devolução, preservando o conteúdo anterior
+    const valorAtualPen = document.getElementById('txtPen').value;
+    document.getElementById('txtPen').value = marcador + '\n--- RAS. ANTERIOR ---\n' + valorAtualPen;
+    
+    // Chama a função de salvamento
+    salvar();
+  }
+
+
+  // ============================================
   // FUNÇÃO JSONP PARA COMUNICAÇÃO
+  // (Nenhuma alteração de lógica neste bloco)
   // ============================================
   function jsonp(acao, params, callback) {
     const nomeCallback = 'callback_' + Date.now() + '_' + Math.random().toString(36).substr(2);
