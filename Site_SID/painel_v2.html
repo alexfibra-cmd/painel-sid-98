@@ -16,7 +16,7 @@
     .controls-group { display:flex; gap:2px; }
     .btn-win { background:var(--win-grey); border:1px outset #fff; width:18px; height:18px; font-size:10px; line-height:1; font-weight:bold; cursor:pointer; text-align:center; color:#000; }
     .btn-win:hover { background: #e0e0e0; }
-    .btn-win.close { color: #d00000; font-size: 12px; }
+    .btn-win.close { color: #d0000; font-size: 12px; }
     .btn-win:active { border-style:inset; }
 
     /* LAYOUT */
@@ -38,11 +38,11 @@
     .status-badge { padding: 2px 5px; border-radius: 3px; font-weight: bold; font-size: 10px; border: 1px solid #999; }
     /* ATENÇÃO: CSS para 6 colunas na info-grid */
     .info-grid { 
-        display:grid; 
-        grid-template-columns:repeat(6,1fr); /* Ajustado para 6 colunas */
-        background:#e0e0e0; 
-        border:2px inset #fff; 
-        padding:5px; 
+    display:grid; 
+    grid-template-columns:repeat(6,1fr); /* Ajustado para 6 colunas */
+    background:#e0e0e0; 
+    border:2px inset #fff; 
+    padding:5px; 
     }
     .info-item span { display:block; color:#000080; font-weight:bold; font-size:11px; }
     
@@ -78,229 +78,233 @@
 
     /* SUGESTÕES DE BUSCA */
     .suggestions-box { 
-      position: absolute; 
-      background: white; 
-      border: 2px outset #fff; 
-      max-height: 150px; 
-      overflow-y: auto; 
-      z-index: 1000; 
-      display: none;
-      font-size: 11px;
+    position: absolute; 
+    background: white; 
+    border: 2px outset #fff; 
+    max-height: 150px; 
+    overflow-y: auto; 
+    z-index: 1000; 
+    display: none;
+    font-size: 11px;
     }
     .suggestion-item:hover { 
-      background: #000080; 
-      color: white; 
+    background: #000080; 
+    color: white; 
     }
     
     /* ESTILOS DE EVIDÊNCIA */
     .evidence-area {
-      padding: 5px;
-      border: 2px inset #fff;
-      background: #f0f0f0;
-      min-height: 100px;
+    padding: 5px;
+    border: 2px inset #fff;
+    background: #f0f0f0;
+    min-height: 100px;
     }
     .file-preview {
-      display: inline-block;
-      margin: 3px;
-      padding: 3px;
-      border: 1px solid #aaa;
-      background: #fff;
-      font-size: 10px;
+    display: inline-block;
+    margin: 3px;
+    padding: 3px;
+    border: 1px solid #aaa;
+    background: #fff;
+    font-size: 10px;
     }
     .file-preview .remove-btn {
-      color: red;
-      font-weight: bold;
-      cursor: pointer;
-      margin-left: 5px;
+    color: red;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 5px;
     }
   </style>
 </head>
 <body onload="checkLoginState()">
 
   <div id="taskbarBtn" style="position:fixed; bottom:10px; right:10px; z-index:9999; display:none;">
-      <button class="btn-taskbar" onclick="restoreApp()">🖥️ SID 98</button>
+    <button class="btn-taskbar" onclick="restoreApp()">🖥️ SID 98</button>
   </div>
   
   <div id="telaLogin" class="win-window" style="width:300px;">
     <div class="title-bar"><span>🔒 Login SID 98</span></div>
     <div style="padding:20px;">
-      <label style="font-size:11px; font-weight:bold;">E-mail Corporativo:</label>
-      <input type="text" id="emailLogin" style="width:100%; margin-bottom:10px; padding:4px;">
-      <button class="btn-98 primary" style="width:100%" onclick="login()">ENTRAR</button>
+    <label style="font-size:11px; font-weight:bold;">E-mail Corporativo:</label>
+    <input type="text" id="emailLogin" style="width:100%; margin-bottom:10px; padding:4px;">
+    <button class="btn-98 primary" style="width:100%" onclick="login()">ENTRAR</button>
     </div>
   </div>
 
   <div id="mainApp" class="win-window">
     <div class="title-bar" id="appTitleBar">
-      <span>GERENCIA OPERACIONAL BACKBONE</span>
-      <div class="controls-group">
-          <div class="btn-win" onclick="minimizeApp()">_</div>
-          <div class="btn-win" onclick="toggleMaximize()">□</div>
-          <div class="btn-win close" onclick="closeApp()">X</div>
-      </div>
+    <span>GERENCIA OPERACIONAL BACKBONE</span>
+    <div class="controls-group">
+    <div class="btn-win" onclick="minimizeApp()">_</div>
+    <div class="btn-win" onclick="toggleMaximize()">□</div>
+    <div class="btn-win close" onclick="closeApp()">X</div>
+    </div>
     </div>
     
     <div class="app-body">
-      <div class="sidebar">
-        <div style="border:2px groove #fff; padding:5px; margin-bottom:5px;">
-          <input type="text" id="termo" placeholder="ID ou Nome..." style="width:100%; padding:3px;" onkeydown="if(event.key=='Enter') buscar()">
-          <button class="btn-98" style="width:100%; margin-top:4px;" onclick="buscar()">🔎 Localizar Obra</button>
-        </div>
+    <div class="sidebar">
+    <div style="border:2px groove #fff; padding:5px; margin-bottom:5px;">
+    <input type="text" id="termo" placeholder="ID ou Nome..." style="width:100%; padding:3px;" onkeydown="if(event.key=='Enter') buscar()">
+    <button class="btn-98" style="width:100%; margin-top:4px;" onclick="buscar()">🔎 Localizar Obra</button>
+    </div>
 
-        <button class="btn-98 nav-btn active" onclick="alert('Módulo Ativo')">
-          🛠️ <b>SEG.55 - MANUTENÇÃO</b>
-        </button>
-        
-        <button class="btn-98 nav-btn disabled" onclick="alert('🚧 Módulo SEG.63 em Construção!')">
-          📡 SEG.63 - MELHORIA (DC)
-        </button>
-        
-        <button class="btn-98 nav-btn disabled" onclick="alert('🚧 Módulo Financeiro em Construção!')">
-          💰 SALDO GESTECH GERENCIAL
-        </button>
-        
-        <button class="btn-98 nav-btn disabled" onclick="alert('🚧 Módulo Escala em Construção!')">
-          📅 ESCALA PLANTÃO TÉCNICO
-        </button>
+    <button class="btn-98 nav-btn active" onclick="alert('Módulo Ativo')">
+    🛠️ <b>SEG.55 - MANUTENÇÃO</b>
+    </button>
+    
+    <button class="btn-98 nav-btn disabled" onclick="alert('🚧 Módulo SEG.63 em Construção!')">
+    📡 SEG.63 - MELHORIA (DC)
+    </button>
+    
+    <button class="btn-98 nav-btn disabled" onclick="alert('🚧 Módulo Financeiro em Construção!')">
+    💰 SALDO GESTECH GERENCIAL
+    </button>
+    
+    <button class="btn-98 nav-btn disabled" onclick="alert('🚧 Módulo Escala em Construção!')">
+    📅 ESCALA PLANTÃO TÉCNICO
+    </button>
 
-        <button class="btn-98 nav-btn disabled" onclick="alert('🚧 Módulo Supervisão em Construção!')">
-          👮 SUPERVISORES PLANTÃO
-        </button>
-      </div>
+    <button class="btn-98 nav-btn disabled" onclick="alert('🚧 Módulo Supervisão em Construção!')">
+    👮 SUPERVISORES PLANTÃO
+    </button>
+    </div>
 
-      <div class="content-area">
-        <div class="table-container">
-          <table id="tbResult">
-            <thead>
-              <tr>
-                <th width="8%">ID</th>
-                <th width="8%">Operadora</th>
-                <th width="15%">Descrição</th>
-                <th width="8%">Status</th>
-                <th width="8%">Supervisor</th>
-                <th width="8%">Técnico</th> <th width="15%">Máscara BA</th>
-                <th width="10%">Aplicação</th>
-                <th width="10%">Pendência</th>
-                <th width="8%" style="text-align:center">Ação</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-          <div id="msgInicial" style="padding:50px; text-align:center; color:#888;">
-            <p>Utilize a busca lateral para carregar as obras do SEG.55.</p>
-          </div>
-        </div>
-      </div>
+    <div class="content-area">
+    <div class="table-container">
+    <table id="tbResult">
+    <thead>
+    <tr>
+    <th width="8%">ID</th>
+    <th width="8%">Operadora</th>
+    <th width="15%">Descrição</th>
+    <th width="8%">Status</th>
+    <th width="8%">Supervisor</th>
+    <th width="8%">Técnico</th> <th width="15%">Máscara BA</th>
+    <th width="10%">Aplicação</th>
+    <th width="10%">Pendência</th>
+    <th width="8%" style="text-align:center">Ação</th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+    </table>
+    <div id="msgInicial" style="padding:50px; text-align:center; color:#888;">
+    <p>Utilize a busca lateral para carregar as obras do SEG.55.</p>
+    </div>
+    </div>
+    </div>
     </div>
     
     <div style="background:var(--win-grey); border-top:2px groove #fff; padding:2px 5px; font-size:10px; display:flex; justify-content:space-between;">
-      <span id="userDisplay"></span>
-      <span>Base Conectada: BASE_DASH_OBRAS</span>
-      <span>Status: Online v7.2</span>
+    <span id="userDisplay"></span>
+    <span>Base Conectada: BASE_DASH_OBRAS</span>
+    <span>Status: Online v7.2</span>
     </div>
   </div>
 
   <div id="modalEdicao" class="modal-overlay">
     <div class="modal-box win-window">
-      <div class="title-bar">
-        <span id="lblModalTitulo">FICHA TÉCNICA</span>
-        <div class="controls-group">
-            <div class="btn-win" onclick="closeModal()">X</div>
-        </div>
-      </div>
-      
-      <div class="modal-content">
-        <input type="hidden" id="hdnCod">
-        
-        <div class="info-grid">
-          <div class="info-item"><label>ID:</label><span id="vID">-</span></div>
-          <div class="info-item"><label>DESC:</label><span id="vDesc">-</span></div>
-          <div class="info-item"><label>OP:</label><span id="vOp">-</span></div>
-          <div class="info-item"><label>STATUS:</label><span id="vSt">-</span></div>
-          <div class="info-item"><label>SUP:</label><span id="vSup">-</span></div>
-          <div class="info-item"><label>TÉCNICO:</label><span id="vTec">-</span></div> </div>
+    <div class="title-bar">
+    <span id="lblModalTitulo">FICHA TÉCNICA</span>
+    <div class="controls-group">
+    <div class="btn-win" onclick="closeModal()">X</div>
+    </div>
+    </div>
+    
+    <div class="modal-content">
+    <input type="hidden" id="hdnCod">
+    
+    <div class="info-grid">
+    <div class="info-item"><label>ID:</label><span id="vID">-</span></div>
+    <div class="info-item"><label>DESC:</label><span id="vDesc">-</span></div>
+    <div class="info-item"><label>OP:</label><span id="vOp">-</span></div>
+    <div class="info-item"><label>STATUS:</label><span id="vSt">-</span></div>
+    <div class="info-item"><label>SUP:</label><span id="vSup">-</span></div>
+    <div class="info-item"><label>TÉCNICO:</label><span id="vTec">-</span></div> </div>
 
-        <div class="editor-layout">
-          <div class="col-left">
-            <div class="group-box">
-              <div class="group-title">1. MÁSCARA / RELATÓRIO TÉCNICO</div>
-              <textarea id="txtMas" placeholder="Descreva o serviço..."></textarea>
-            </div>
-            
-            <div class="group-box" style="background:#fff0f0; border-color:red;">
-              <div class="group-title" style="color:red;">3. PENDÊNCIAS / DEVOLUÇÃO</div>
-              <textarea id="txtPen" placeholder="Motivo de devolução..."></textarea>
-            </div>
-            
-            <div class="group-box" style="flex: 0 0 160px;">
-                <div class="group-title">4. EVIDÊNCIAS (FOTOS) - Máx. 10 arquivos</div>
-                <input type="file" id="fileUpload" multiple accept="image/*" onchange="handleFileSelect()" style="padding: 5px 0;">
-                <div class="evidence-area" id="filePreviewArea">
-                    <span style="color:#666; font-size:11px;">Nenhuma evidência selecionada.</span>
-                </div>
-            </div>
-          </div>
+    <div class="editor-layout">
+    <div class="col-left">
+    <div class="group-box">
+    <div class="group-title">1. MÁSCARA / RELATÓRIO TÉCNICO</div>
+    <textarea id="txtMas" placeholder="Descreva o serviço..."></textarea>
+    </div>
+    
+    <div class="group-box" style="background:#fff0f0; border-color:red;">
+    <div class="group-title" style="color:red;">3. PENDÊNCIAS / DEVOLUÇÃO</div>
+    <textarea id="txtPen" placeholder="Motivo de devolução..."></textarea>
+    </div>
+    
+    <div class="group-box" style="flex: 0 0 160px;">
+    <div class="group-title">4. EVIDÊNCIAS (FOTOS) - Máx. 10 arquivos</div>
+    <input type="file" id="fileUpload" multiple accept="image/*" onchange="handleFileSelect()" style="padding: 5px 0;">
+    <div class="evidence-area" id="filePreviewArea">
+    <span style="color:#666; font-size:11px;">Nenhuma evidência selecionada.</span>
+    </div>
+    </div>
+    </div>
 
-          <div class="col-right">
-            <div class="group-box">
-              <div class="group-title">2. APLICAÇÃO DE MATERIAIS E SERVIÇOS</div>
-              
-              <div class="cart-controls">
-                <div class="type-selector">
-                  <select id="selTipo" onchange="carregarOpcoes()" style="font-size:11px;">
-                    <option value="CLIENTE">MATERIAL CLIENTE</option>
-                    <option value="PROPRIO">MATERIAL PRÓPRIO</option>
-                    <option value="SERVICO">SERVIÇOS</option>
-                  </select>
-                </div>
-                
-                <div class="search-box">
-                  <input type="text" id="buscaRapida" 
-                         placeholder="🔍 Buscar por código ou descrição..." 
-                         style="flex:1; padding:4px;"
-                         onkeyup="filtrarOpcoes()"
-                         onfocus="mostrarSugestoes()">
-                  <div id="sugestoesBox" class="suggestions-box"></div>
-                </div>
-                
-                <div class="item-selector">
-                  <select id="selMaterial" size="5" style="flex:1; font-size:11px;">
-                    <option value="">Selecione um item...</option>
-                  </select>
-                </div>
-                
-                <div class="quantity-controls">
-                  <span style="font-size:11px;">Qtd:</span>
-                  <input type="number" id="qtdMat" value="1" min="1" max="999" style="width:60px;">
-                  <button class="btn-98" onclick="adicionarItem()" style="font-size:11px; padding:4px 8px;">➕ ADD</button>
-                </div>
-              </div>
+    <div class="col-right">
+    <div class="group-box">
+    <div class="group-title">2. APLICAÇÃO DE MATERIAIS E SERVIÇOS</div>
+    
+    <div class="cart-controls">
+    <div class="type-selector">
+    <select id="selTipo" onchange="carregarOpcoes()" style="font-size:11px;">
+    <option value="CLIENTE">MATERIAL CLIENTE</option>
+    <option value="PROPRIO">MATERIAL PRÓPRIO</option>
+    <option value="SERVICO">SERVIÇOS</option>
+    </select>
+    </div>
+    
+    <div class="search-box">
+    <input type="text" id="buscaRapida" 
+    placeholder="🔍 Buscar por código ou descrição..." 
+    style="flex:1; padding:4px;"
+    onkeyup="filtrarOpcoes()"
+    onfocus="mostrarSugestoes()">
+    <div id="sugestoesBox" class="suggestions-box"></div>
+    </div>
+    
+    <div class="item-selector">
+    <select id="selMaterial" size="5" style="flex:1; font-size:11px;">
+    <option value="">Selecione um item...</option>
+    </select>
+    </div>
+    
+    <div class="quantity-controls">
+    <span style="font-size:11px;">Qtd:</span>
+    <input type="number" id="qtdMat" value="1" min="1" max="999" style="width:60px;">
+    <button class="btn-98" onclick="adicionarItem()" style="font-size:11px; padding:4px 8px;">➕ ADD</button>
+    </div>
+    </div>
 
-              <div class="cart-list" id="listaCarrinho">
-                </div>
-              <div style="font-size:10px; color:#666; margin-top:5px;">
-                💡 <b>Dica:</b> Digite parte do código ou nome para buscar rapidamente
-              </div>
-            </div>
-          </div>
-        </div>
+    <div class="cart-list" id="listaCarrinho">
+    </div>
+    <div style="font-size:10px; color:#666; margin-top:5px;">
+    💡 <b>Dica:</b> Digite parte do código ou nome para buscar rapidamente
+    </div>
+    </div>
+    </div>
+    </div>
 
-        <div style="text-align:right; border-top:1px solid #999; padding-top:5px; display:flex; justify-content:flex-end; gap:8px;">
-          
-          <button class="btn-98" style="background:#008080; color:white; font-weight:bold; min-width:140px;" onclick="enviarRDO()">📄 ENVIAR RDO</button>
-          <button class="btn-98" style="background:#ccffcc; font-weight:bold; min-width:180px;" onclick="concluirEmCampo()">✅ CONCLUÍDA EM CAMPO</button>
-          <button class="btn-98" id="btnRascunhado" style="background:#ffffcc; font-weight:bold; min-width:120px;" onclick="rascunhado()">🔒 RASCUNHADO</button>
+    <div style="text-align:right; border-top:1px solid #999; padding-top:5px; display:flex; justify-content:flex-end; gap:8px;">
+    
+    <button class="btn-98" style="background:#008080; color:white; font-weight:bold; min-width:140px;" onclick="enviarRDO()">📄 ENVIAR RDO</button>
+    <button class="btn-98" style="background:#ccffcc; font-weight:bold; min-width:180px;" onclick="concluirEmCampo()">✅ CONCLUÍDA EM CAMPO</button>
+    <button class="btn-98" id="btnRascunhado" style="background:#ffffcc; font-weight:bold; min-width:120px;" onclick="rascunhado()">🔒 RASCUNHADO</button>
 
-          <button class="btn-98" onclick="closeModal()">CANCELAR</button>
-          <button class="btn-98 primary" onclick="salvar()">💾 SALVAR DADOS</button>
-        </div>
-      </div>
+    <button class="btn-98" onclick="closeModal()">CANCELAR</button>
+    <button class="btn-98 primary" onclick="salvar()">💾 SALVAR DADOS</button>
+    </div>
+    </div>
     </div>
   </div>
 
 <script>
   // CONFIGURAÇÃO
+  // CONFIGURAÇÃO
   const API = 'https://script.google.com/macros/s/AKfycbwH6dek08S8I8dpKXWYZR7flENqCXJPqtX-OlJKd9jMuVBYAR1eC5-y-eJ4RztswNQq/exec';
+  
+  // Timeout para requisições (ms)
+  const REQUEST_TIMEOUT = 30000;
   
   // VARIÁVEIS GLOBAIS
   let CATALOGO = { materiais: [], servicos: [] };
@@ -310,9 +314,9 @@
   let USER_IS_ANALYST = false; // NOVA VARIÁVEL DE PERMISSÃO
   let UPLOADED_FILES = []; // Array para armazenar arquivos selecionados
   
-  // ============================================
+  // ====
   // FUNÇÕES DE CONTROLE DA JANELA
-  // ============================================
+  // ====
   function minimizeApp() {
     document.getElementById('mainApp').style.display = 'none';
     document.getElementById('taskbarBtn').style.display = 'block';
@@ -326,25 +330,25 @@
   function toggleMaximize() {
     const app = document.getElementById('mainApp');
     if (app.style.maxWidth === 'none' || app.style.maxWidth === '') {
-      app.style.maxWidth = '1400px';
-      app.style.height = '98vh';
-      app.style.width = '98%';
+    app.style.maxWidth = '1400px';
+    app.style.height = '98vh';
+    app.style.width = '98%';
     } else {
-      app.style.maxWidth = 'none';
-      app.style.width = '100vw';
-      app.style.height = '100vh';
+    app.style.maxWidth = 'none';
+    app.style.width = '100vw';
+    app.style.height = '100vh';
     }
   }
 
   function closeApp() {
     if(confirm("Deseja fechar o Painel Gerencial?")) {
-      window.close();
+    window.close();
     }
   }
 
-  // ============================================
+  // ====
   // SISTEMA DE LOGIN E PERMISSÃO
-  // ============================================
+  // ====
   
   function getQueryParam(param) {
     const urlParams = new URLSearchParams(window.location.search);
@@ -354,192 +358,209 @@
   function checkLoginState() {
     const user = sessionStorage.getItem('usuarioSID');
     if (user) {
-      document.getElementById('telaLogin').style.display = 'none';
-      document.getElementById('mainApp').style.display = 'flex';
-      document.getElementById('userDisplay').textContent = "Usuário: " + user;
+    document.getElementById('telaLogin').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'flex';
+    document.getElementById('userDisplay').textContent = "Usuário: " + user;
 
-      // Chama a checagem de permissão (agora a função está definida abaixo)
-      checkAnalystPermission(user); 
-      carregarCatalogo(); // Chama a função de catálogo (agora a função está definida abaixo)
-      
-      const obraId = getQueryParam('obra_id');
-      if (obraId) {
-        document.getElementById('termo').value = obraId;
-        setTimeout(buscar, 500); 
-      }
+    // Chama a checagem de permissão (agora a função está definida abaixo)
+    checkAnalystPermission(user); 
+    carregarCatalogo(); // Chama a função de catálogo (agora a função está definida abaixo)
+    
+    const obraId = getQueryParam('obra_id');
+    if (obraId) {
+    document.getElementById('termo').value = obraId;
+    setTimeout(buscar, 500); 
+    }
     } else {
-        // Inicializa o estado do botão RASCUNHADO como desativado por padrão
-        const btn = document.getElementById('btnRascunhado');
-        if (btn) btn.disabled = true;
+    // Inicializa o estado do botão RASCUNHADO como desativado por padrão
+    const btn = document.getElementById('btnRascunhado');
+    if (btn) btn.disabled = true;
     }
   }
 
   function checkAnalystPermission(email) {
-      jsonp('verificar_permissao', { email: email }, function(resposta) {
-          USER_IS_ANALYST = resposta.isAnalista || false;
-          
-          const btn = document.getElementById('btnRascunhado');
-          if (btn) {
-              if (USER_IS_ANALYST) {
-                  btn.disabled = false;
-                  btn.textContent = '🔒 RASCUNHADO';
-                  btn.style.opacity = 1.0;
-                  btn.title = "Ação exclusiva do Analista.";
-              } else {
-                  btn.disabled = true;
-                  btn.textContent = '🔒 RASCUNHADO';
-                  btn.style.opacity = 0.5;
-                  btn.title = "Ação restrita ao Analista de Dados.";
-              }
-          }
-      });
+    jsonp('verificar_permissao', { email: email }, function(resposta) {
+    USER_IS_ANALYST = resposta.isAnalista || false;
+    
+    const btn = document.getElementById('btnRascunhado');
+    if (btn) {
+    if (USER_IS_ANALYST) {
+    btn.disabled = false;
+    btn.textContent = '🔒 RASCUNHADO';
+    btn.style.opacity = 1.0;
+    btn.title = "Ação exclusiva do Analista.";
+    } else {
+    btn.disabled = true;
+    btn.textContent = '🔒 RASCUNHADO';
+    btn.style.opacity = 0.5;
+    btn.title = "Ação restrita ao Analista de Dados.";
+    }
+    }
+    });
   }
 
   function login() {
     const email = document.getElementById('emailLogin').value;
     if(!email.includes('@')) {
-      alert('E-mail inválido');
-      return;
+    alert('E-mail inválido');
+    return;
     }
     
     jsonp('login', {email: email}, function(resposta) {
-      if(resposta.sucesso) {
-        document.getElementById('telaLogin').style.display = 'none';
-        document.getElementById('mainApp').style.display = 'flex';
-        sessionStorage.setItem('usuarioSID', email);
-        document.getElementById('userDisplay').textContent = "Usuário: " + email;
-        checkAnalystPermission(email);
-        carregarCatalogo();
-      } else {
-        alert(resposta.msg || 'Erro no login');
-      }
+    if(resposta.sucesso) {
+    document.getElementById('telaLogin').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'flex';
+    sessionStorage.setItem('usuarioSID', email);
+    document.getElementById('userDisplay').textContent = "Usuário: " + email;
+    checkAnalystPermission(email);
+    carregarCatalogo();
+    } else {
+    alert(resposta.msg || 'Erro no login');
+    }
     });
   }
   
-  // ============================================
+  // ====
   // GESTÃO DE ARQUIVOS (EVIDÊNCIAS) - NOVO
-  // ============================================
+  // ====
   function handleFileSelect() {
-      const input = document.getElementById('fileUpload');
-      const area = document.getElementById('filePreviewArea');
-      
-      // Se a chamada não veio do input, apenas renderiza o que já temos
-      if (input && input.files && input.files.length > 0) {
-          UPLOADED_FILES = Array.from(input.files);
-      }
-      
-      if (UPLOADED_FILES.length > 10) {
-          alert(`Você selecionou ${UPLOADED_FILES.length} arquivos. O máximo permitido é 10.`);
-          UPLOADED_FILES = UPLOADED_FILES.slice(0, 10);
-      }
-      
-      area.innerHTML = '';
-      if (UPLOADED_FILES.length === 0) {
-          area.innerHTML = '<span style="color:#666; font-size:11px;">Nenhuma evidência selecionada.</span>';
-          return;
-      }
-      
-      UPLOADED_FILES.forEach((file, index) => {
-          const div = document.createElement('div');
-          div.className = 'file-preview';
-          div.innerHTML = `${index + 1}. ${file.name.substring(0, 15)}... <span class="remove-btn" onclick="removeFile(${index})">X</span>`;
-          area.appendChild(div);
-      });
+    const input = document.getElementById('fileUpload');
+    const area = document.getElementById('filePreviewArea');
+    
+    // Se a chamada não veio do input, apenas renderiza o que já temos
+    if (input && input.files && input.files.length > 0) {
+    UPLOADED_FILES = Array.from(input.files);
+    }
+    
+    if (UPLOADED_FILES.length > 10) {
+    alert(`Você selecionou ${UPLOADED_FILES.length} arquivos. O máximo permitido é 10.`);
+    UPLOADED_FILES = UPLOADED_FILES.slice(0, 10);
+    }
+    
+    area.innerHTML = '';
+    if (UPLOADED_FILES.length === 0) {
+    area.innerHTML = '<span style="color:#666; font-size:11px;">Nenhuma evidência selecionada.</span>';
+    return;
+    }
+    
+    UPLOADED_FILES.forEach((file, index) => {
+    const div = document.createElement('div');
+    div.className = 'file-preview';
+    div.innerHTML = `${index + 1}. ${file.name.substring(0, 15)}... <span class="remove-btn" onclick="removeFile(${index})">X</span>`;
+    area.appendChild(div);
+    });
   }
   
   function removeFile(index) {
-      UPLOADED_FILES.splice(index, 1);
-      handleFileSelect(); // Renderiza novamente
+    UPLOADED_FILES.splice(index, 1);
+    handleFileSelect(); // Renderiza novamente
   }
   
   function uploadFilesToDrive(callback) {
-      if (UPLOADED_FILES.length === 0) {
-          callback([]); 
-          return;
-      }
-      
-      const codObra = document.getElementById('hdnCod').value;
-      const data = new FormData();
-      data.append('codObra', codObra);
-      
-      UPLOADED_FILES.forEach((file, index) => {
-          data.append('file' + index, file);
-      });
-      
-      const btnEnviar = document.querySelector('.modal-content button[onclick="enviarRDO()"]');
-      const textoOriginal = btnEnviar ? btnEnviar.textContent : 'ENVIAR RDO';
-      if (btnEnviar) {
-          btnEnviar.textContent = '⬆️ Enviando Fotos...';
-          btnEnviar.disabled = true;
-      }
+    if (UPLOADED_FILES.length === 0) {
+      callback([]);
+      return;
+    }
 
-      fetch(API + '?acao=upload_evidencias&codObra=' + codObra, {
-          method: 'POST',
-          body: data
-      })
-      .then(response => response.json())
-      .then(response => {
-          if (btnEnviar) {
-              btnEnviar.textContent = textoOriginal;
-              btnEnviar.disabled = false;
-          }
-          if (response.sucesso) {
-              callback(response.fileUrls); 
-          } else {
-              alert('❌ Erro no upload: ' + (response.mensagem || 'Falha desconhecida.'));
-              callback(null); 
-          }
-      })
-      .catch(error => {
-          if (btnEnviar) {
-              btnEnviar.textContent = textoOriginal;
-              btnEnviar.disabled = false;
-          }
-          console.error('Erro de rede/upload:', error);
-          alert('❌ Erro de comunicação durante o upload.');
-          callback(null);
-      });
+    const codObra = document.getElementById('hdnCod').value;
+    if (!codObra) {
+      alert('❌ Código da obra não encontrado. Não foi possível enviar as fotos.');
+      callback(null);
+      return;
+    }
+
+    const data = new FormData();
+    data.append('codObra', codObra);
+
+    // Limita a 10 arquivos
+    const filesToUpload = UPLOADED_FILES.slice(0, 10);
+    filesToUpload.forEach((file, index) => {
+      data.append('file' + index, file);
+    });
+
+    const btnEnviar = document.querySelector('.modal-content button[onclick="enviarRDO()"]');
+    const textoOriginal = btnEnviar ? btnEnviar.textContent : 'ENVIAR RDO';
+    if (btnEnviar) {
+      btnEnviar.textContent = '⬆️ Enviando Fotos...';
+      btnEnviar.disabled = true;
+    }
+
+    console.log('Iniciando upload de ' + filesToUpload.length + ' arquivos para a obra ' + codObra);
+
+    fetch(API + '?acao=upload_evidencias&codObra=' + encodeURIComponent(codObra), {
+      method: 'POST',
+      body: data
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('HTTP error! status: ' + response.status);
+      }
+      return response.json();
+    })
+    .then(response => {
+      console.log('Resposta do upload:', response);
+      if (btnEnviar) {
+        btnEnviar.textContent = textoOriginal;
+        btnEnviar.disabled = false;
+      }
+      if (response && response.sucesso) {
+        callback(response.fileUrls || []);
+      } else {
+        const errorMsg = response && response.mensagem ? response.mensagem : 'Falha desconhecida no upload.';
+        alert('❌ Erro no upload: ' + errorMsg);
+        callback(null);
+      }
+    })
+    .catch(error => {
+      console.error('Erro de rede/upload:', error);
+      if (btnEnviar) {
+        btnEnviar.textContent = textoOriginal;
+        btnEnviar.disabled = false;
+      }
+      alert('❌ Erro de comunicação durante o upload: ' + error.message);
+      callback(null);
+    });
   }
   
-  // ============================================
+  // ====
   // SISTEMA DE CATÁLOGO COM BUSCA RÁPIDA - RESTAURADO
-  // ============================================
+  // ====
   function carregarCatalogo() {
     console.log('Carregando catálogo...');
     jsonp('listar_catalogos', {}, function(resposta) {
-      console.log('Resposta do catálogo:', resposta);
-      
-      CATALOGO.materiais = resposta.materiais || [];
-      CATALOGO.servicos = resposta.servicos || [];
-      
-      // Prepara lista completa para busca
-      TODOS_ITENS = [];
-      
-      // Adiciona materiais
-      CATALOGO.materiais.forEach(item => {
-        TODOS_ITENS.push({
-          tipo: item.origem,
-          codigo: item.cod,
-          descricao: item.desc,
-          unidade: item.unid,
-          categoria: 'MATERIAL'
-        });
-      });
-      
-      // Adiciona serviços
-      CATALOGO.servicos.forEach(item => {
-        TODOS_ITENS.push({
-          tipo: 'SERVICO',
-          codigo: item.cod,
-          descricao: item.desc,
-          unidade: item.unid || 'UN',
-          categoria: 'SERVICO'
-        });
-      });
-      
-      console.log('Total de itens carregados:', TODOS_ITENS.length);
-      
-      carregarOpcoes();
+    console.log('Resposta do catálogo:', resposta);
+    
+    CATALOGO.materiais = resposta.materiais || [];
+    CATALOGO.servicos = resposta.servicos || [];
+    
+    // Prepara lista completa para busca
+    TODOS_ITENS = [];
+    
+    // Adiciona materiais
+    CATALOGO.materiais.forEach(item => {
+    TODOS_ITENS.push({
+    tipo: item.origem,
+    codigo: item.cod,
+    descricao: item.desc,
+    unidade: item.unid,
+    categoria: 'MATERIAL'
+    });
+    });
+    
+    // Adiciona serviços
+    CATALOGO.servicos.forEach(item => {
+    TODOS_ITENS.push({
+    tipo: 'SERVICO',
+    codigo: item.cod,
+    descricao: item.desc,
+    unidade: item.unid || 'UN',
+    categoria: 'SERVICO'
+    });
+    });
+    
+    console.log('Total de itens carregados:', TODOS_ITENS.length);
+    
+    carregarOpcoes();
     });
   }
 
@@ -551,11 +572,11 @@
     
     // Filtra itens pelo tipo selecionado
     ITENS_FILTRADOS = TODOS_ITENS.filter(item => {
-      if (tipo === 'SERVICO') {
-        return item.categoria === 'SERVICO';
-      } else {
-        return item.tipo === tipo;
-      }
+    if (tipo === 'SERVICO') {
+    return item.categoria === 'SERVICO';
+    } else {
+    return item.tipo === tipo;
+    }
     });
     
     console.log(`Carregando ${ITENS_FILTRADOS.length} itens para ${tipo}`);
@@ -565,18 +586,18 @@
     
     // Adiciona ao select
     ITENS_FILTRADOS.forEach(item => {
-      const option = document.createElement('option');
-      option.value = item.codigo;
-      option.textContent = `${item.codigo} - ${item.descricao} (${item.unidade})`;
-      option.setAttribute('data-desc', item.descricao);
-      option.setAttribute('data-unid', item.unidade);
-      option.setAttribute('data-tipo', item.tipo);
-      select.appendChild(option);
+    const option = document.createElement('option');
+    option.value = item.codigo;
+    option.textContent = `${item.codigo} - ${item.descricao} (${item.unidade})`;
+    option.setAttribute('data-desc', item.descricao);
+    option.setAttribute('data-unid', item.unidade);
+    option.setAttribute('data-tipo', item.tipo);
+    select.appendChild(option);
     });
     
     // Seleciona primeiro item se houver
     if (ITENS_FILTRADOS.length > 0) {
-      select.selectedIndex = 0;
+    select.selectedIndex = 0;
     }
     
     document.getElementById('qtdMat').value = 1;
@@ -591,30 +612,30 @@
     const tipoAtual = document.getElementById('selTipo').value;
     
     if (!termo) {
-      carregarOpcoes();
-      document.getElementById('sugestoesBox').style.display = 'none';
-      return;
+    carregarOpcoes();
+    document.getElementById('sugestoesBox').style.display = 'none';
+    return;
     }
     
     // Filtra itens
     const resultados = TODOS_ITENS.filter(item => {
-      const filtroTipo = tipoAtual === 'SERVICO' ? item.categoria === 'SERVICO' : item.tipo === tipoAtual;
-      const buscaCodigo = item.codigo.toUpperCase().includes(termo);
-      const buscaDescricao = item.descricao.toUpperCase().includes(termo);
-      
-      return filtroTipo && (buscaCodigo || buscaDescricao);
+    const filtroTipo = tipoAtual === 'SERVICO' ? item.categoria === 'SERVICO' : item.tipo === tipoAtual;
+    const buscaCodigo = item.codigo.toUpperCase().includes(termo);
+    const buscaDescricao = item.descricao.toUpperCase().includes(termo);
+    
+    return filtroTipo && (buscaCodigo || buscaDescricao);
     });
     
     // Atualiza select
     select.innerHTML = '';
     resultados.forEach(item => {
-      const option = document.createElement('option');
-      option.value = item.codigo;
-      option.textContent = `${item.codigo} - ${item.descricao} (${item.unidade})`;
-      option.setAttribute('data-desc', item.descricao);
-      option.setAttribute('data-unid', item.unidade);
-      option.setAttribute('data-tipo', item.tipo);
-      select.appendChild(option);
+    const option = document.createElement('option');
+    option.value = item.codigo;
+    option.textContent = `${item.codigo} - ${item.descricao} (${item.unidade})`;
+    option.setAttribute('data-desc', item.descricao);
+    option.setAttribute('data-unid', item.unidade);
+    option.setAttribute('data-tipo', item.tipo);
+    select.appendChild(option);
     });
     
     // Mostra sugestões
@@ -622,7 +643,7 @@
     
     // Seleciona primeiro item se houver
     if (resultados.length > 0) {
-      select.selectedIndex = 0;
+    select.selectedIndex = 0;
     }
   }
 
@@ -633,24 +654,24 @@
     const tipoAtual = document.getElementById('selTipo').value;
     
     if (!input.value.trim()) {
-      box.style.display = 'none';
-      return;
+    box.style.display = 'none';
+    return;
     }
     
     termo = termo || input.value.toUpperCase().trim();
     
     // Filtra sugestões
     const sugestoes = TODOS_ITENS.filter(item => {
-      const filtroTipo = tipoAtual === 'SERVICO' ? item.categoria === 'SERVICO' : item.tipo === tipoAtual;
-      const buscaCodigo = item.codigo.toUpperCase().includes(termo);
-      const buscaDescricao = item.descricao.toUpperCase().includes(termo);
-      
-      return filtroTipo && (buscaCodigo || buscaDescricao);
+    const filtroTipo = tipoAtual === 'SERVICO' ? item.categoria === 'SERVICO' : item.tipo === tipoAtual;
+    const buscaCodigo = item.codigo.toUpperCase().includes(termo);
+    const buscaDescricao = item.descricao.toUpperCase().includes(termo);
+    
+    return filtroTipo && (buscaCodigo || buscaDescricao);
     }).slice(0, 10); // Limita a 10 sugestões
     
     if (sugestoes.length === 0) {
-      box.style.display = 'none';
-      return;
+    box.style.display = 'none';
+    return;
     }
     
     // Posiciona a caixa de sugestões
@@ -663,23 +684,23 @@
     // Preenche sugestões
     box.innerHTML = '';
     sugestoes.forEach((item, index) => {
-      const div = document.createElement('div');
-      div.className = 'suggestion-item';
-      div.textContent = `${item.codigo} - ${item.descricao}`;
-      div.onclick = function() {
-        input.value = item.codigo;
-        box.style.display = 'none';
-        
-        // Seleciona o item no select
-        const select = document.getElementById('selMaterial');
-        for (let i = 0; i < select.options.length; i++) {
-          if (select.options[i].value === item.codigo) {
-            select.selectedIndex = i;
-            break;
-          }
-        }
-      };
-      box.appendChild(div);
+    const div = document.createElement('div');
+    div.className = 'suggestion-item';
+    div.textContent = `${item.codigo} - ${item.descricao}`;
+    div.onclick = function() {
+    input.value = item.codigo;
+    box.style.display = 'none';
+    
+    // Seleciona o item no select
+    const select = document.getElementById('selMaterial');
+    for (let i = 0; i < select.options.length; i++) {
+    if (select.options[i].value === item.codigo) {
+    select.selectedIndex = i;
+    break;
+    }
+    }
+    };
+    box.appendChild(div);
     });
     
     box.style.display = 'block';
@@ -691,7 +712,7 @@
     const input = document.getElementById('buscaRapida');
     
     if (box && !box.contains(e.target) && e.target !== input) {
-      box.style.display = 'none';
+    box.style.display = 'none';
     }
   });
 
@@ -700,13 +721,13 @@
     const quantidade = parseInt(document.getElementById('qtdMat').value);
     
     if (!select.value || select.selectedIndex === -1) {
-      alert('Selecione um item primeiro!');
-      return;
+    alert('Selecione um item primeiro!');
+    return;
     }
     
     if (quantidade < 1 || quantidade > 999) {
-      alert('Quantidade deve ser entre 1 e 999!');
-      return;
+    alert('Quantidade deve ser entre 1 e 999!');
+    return;
     }
     
     const codigo = select.value;
@@ -715,11 +736,11 @@
     const tipo = select.options[select.selectedIndex].getAttribute('data-tipo') || document.getElementById('selTipo').value;
     
     CARRINHO.push({
-      tipo: tipo,
-      codigo: codigo,
-      descricao: descricao,
-      quantidade: quantidade,
-      unidade: unidade
+    tipo: tipo,
+    codigo: codigo,
+    descricao: descricao,
+    quantidade: quantidade,
+    unidade: unidade
     });
     
     atualizarCarrinho();
@@ -742,24 +763,24 @@
     container.innerHTML = '';
     
     if (CARRINHO.length === 0) {
-      container.innerHTML = '<div style="color:#888; text-align:center; padding:10px;">Nenhum item adicionado</div>';
-      return;
+    container.innerHTML = '<div style="color:#888; text-align:center; padding:10px;">Nenhum item adicionado</div>';
+    return;
     }
     
     CARRINHO.forEach((item, index) => {
-      const div = document.createElement('div');
-      div.className = 'cart-item';
-      div.innerHTML = `
-        <span><b>${item.quantidade}x</b> [${item.tipo}] ${item.codigo} - ${item.descricao} (${item.unidade})</span>
-        <span class="cart-del" onclick="removerItem(${index})" title="Remover">✖</span>
-      `;
-      container.appendChild(div);
+    const div = document.createElement('div');
+    div.className = 'cart-item';
+    div.innerHTML = `
+    <span><b>${item.quantidade}x</b> [${item.tipo}] ${item.codigo} - ${item.descricao} (${item.unidade})</span>
+    <span class="cart-del" onclick="removerItem(${index})" title="Remover">✖</span>
+    `;
+    container.appendChild(div);
     });
   }
   
-  // ============================================
+  // ====
   // SISTEMA DE BUSCA E EDIÇÃO
-  // ============================================
+  // ====
   function buscar() {
     const termo = document.getElementById('termo').value.trim();
     if (!termo) return;
@@ -769,43 +790,43 @@
     tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:20px;">Buscando...</td></tr>'; 
     
     jsonp('resolver_obra', {termo: termo}, function(resposta) {
-      tbody.innerHTML = '';
-      
-      if (!resposta.obras || resposta.obras.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:20px;">Nenhuma obra encontrada</td></tr>'; 
-        return;
-      }
-      
-      resposta.obras.forEach(obra => {
-        const safeData = encodeURIComponent(JSON.stringify(obra));
-        
-        let corStatus = "#eee";
-        if (obra.STATUS && obra.STATUS.includes("PENDENTE")) corStatus = "#ffff99";
-        if (obra.STATUS && obra.STATUS.includes("CONCLUÍDO")) corStatus = "#99ff99";
-        
-        const txtMascara = (obra.MASCARA_BA || '').substring(0, 25) + (obra.MASCARA_BA && obra.MASCARA_BA.length > 25 ? '...' : '');
-        const txtAplicacao = (obra.APLICACAO_FEITA || '').substring(0, 25) + (obra.APLICACAO_FEITA && obra.APLICACAO_FEITA.length > 25 ? '...' : '');
-        const txtPendencia = (obra.PENDENCIA_DEVOLUCAO || '').substring(0, 25) + (obra.PENDENCIA_DEVOLUCAO && obra.PENDENCIA_DEVOLUCAO.length > 25 ? '...' : '');
-        
-        const linha = `
-          <tr>
-            <td><b>${obra.COD_OBRA_NUM || ''}</b></td>
-            <td>${obra.OPERADORA || ''}</td>
-            <td>${obra.DESCRICAO || ''}</td>
-            <td><span class="status-badge" style="background:${corStatus}">${obra.STATUS || ''}</span></td>
-            <td>${obra.SUPERVISOR || ''}</td>
-            <td>${obra.TECNICO || 'N/D'}</td> 
-            <td style="color:#000080; font-size:10px;">${txtMascara}</td>
-            <td style="font-size:10px;">${txtAplicacao}</td>
-            <td style="color:red; font-weight:bold; font-size:10px;">${txtPendencia}</td>
-            <td style="text-align:center">
-              <button class="btn-98" onclick="abrirModal('${safeData}')">📝 ABRIR</button>
-            </td>
-          </tr>
-        `;
-        
-        tbody.innerHTML += linha;
-      });
+    tbody.innerHTML = '';
+    
+    if (!resposta.obras || resposta.obras.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:20px;">Nenhuma obra encontrada</td></tr>'; 
+    return;
+    }
+    
+    resposta.obras.forEach(obra => {
+    const safeData = encodeURIComponent(JSON.stringify(obra));
+    
+    let corStatus = "#eee";
+    if (obra.STATUS && obra.STATUS.includes("PENDENTE")) corStatus = "#ffff99";
+    if (obra.STATUS && obra.STATUS.includes("CONCLUÍDO")) corStatus = "#99ff99";
+    
+    const txtMascara = (obra.MASCARA_BA || '').substring(0, 25) + (obra.MASCARA_BA && obra.MASCARA_BA.length > 25 ? '...' : '');
+    const txtAplicacao = (obra.APLICACAO_FEITA || '').substring(0, 25) + (obra.APLICACAO_FEITA && obra.APLICACAO_FEITA.length > 25 ? '...' : '');
+    const txtPendencia = (obra.PENDENCIA_DEVOLUCAO || '').substring(0, 25) + (obra.PENDENCIA_DEVOLUCAO && obra.PENDENCIA_DEVOLUCAO.length > 25 ? '...' : '');
+    
+    const linha = `
+    <tr>
+    <td><b>${obra.COD_OBRA_NUM || ''}</b></td>
+    <td>${obra.OPERADORA || ''}</td>
+    <td>${obra.DESCRICAO || ''}</td>
+    <td><span class="status-badge" style="background:${corStatus}">${obra.STATUS || ''}</span></td>
+    <td>${obra.SUPERVISOR || ''}</td>
+    <td>${obra.TECNICO || 'N/D'}</td> 
+    <td style="color:#000080; font-size:10px;">${txtMascara}</td>
+    <td style="font-size:10px;">${txtAplicacao}</td>
+    <td style="color:red; font-weight:bold; font-size:10px;">${txtPendencia}</td>
+    <td style="text-align:center">
+    <button class="btn-98" onclick="abrirModal('${safeData}')">📝 ABRIR</button>
+    </td>
+    </tr>
+    `;
+    
+    tbody.innerHTML += linha;
+    });
     });
   }
 
@@ -828,20 +849,20 @@
     // 3. Carrega Carrinho
     CARRINHO = [];
     if (obra.APLICACAO_FEITA && obra.APLICACAO_FEITA.trim() !== '') {
-      const itens = obra.APLICACAO_FEITA.split('|').map(item => item.trim()).filter(item => item !== '');
-      
-      itens.forEach(item => {
-        const match = item.match(/\[(.*?)\]\s*(\d+)x\s+(.+?)\s+\((.*?)\)/);
-        if (match) {
-          CARRINHO.push({
-            tipo: match[1],
-            quantidade: parseInt(match[2]),
-            descricao: match[3],
-            codigo: match[4],
-            unidade: 'UN'
-          });
-        }
-      });
+    const itens = obra.APLICACAO_FEITA.split('|').map(item => item.trim()).filter(item => item !== '');
+    
+    itens.forEach(item => {
+    const match = item.match(/\[(.*?)\]\s*(\d+)x\s+(.+?)\s+\((.*?)\)/);
+    if (match) {
+    CARRINHO.push({
+    tipo: match[1],
+    quantidade: parseInt(match[2]),
+    descricao: match[3],
+    codigo: match[4],
+    unidade: 'UN'
+    });
+    }
+    });
     }
     
     atualizarCarrinho();
@@ -859,7 +880,7 @@
     
     // 6. Foca no campo de busca
     setTimeout(() => {
-      document.getElementById('buscaRapida').focus();
+    document.getElementById('buscaRapida').focus();
     }, 100);
   }
 
@@ -868,30 +889,30 @@
     CARRINHO = [];
   }
   
-  // ============================================
+  // ====
   // FUNÇÕES DE AÇÃO RÁPIDA E SALVAMENTO
-  // ============================================
+  // ====
 
   function validarCamposObrigatorios() {
-      const mascara = document.getElementById('txtMas').value.trim();
-      const carrinhoVazio = CARRINHO.length === 0;
-      
-      if (!mascara) {
-          alert('🛑 O campo MÁSCARA / RELATÓRIO TÉCNICO é obrigatório para CONCLUIR/ENVIAR RDO.');
-          document.getElementById('txtMas').focus();
-          return false;
-      }
-      if (carrinhoVazio) {
-          if (!confirm("⚠️ Atenção: O CARRINHO DE MATERIAIS está vazio. Deseja prosseguir mesmo assim?")) {
-              return false;
-          }
-      }
-      return true;
+    const mascara = document.getElementById('txtMas').value.trim();
+    const carrinhoVazio = CARRINHO.length === 0;
+    
+    if (!mascara) {
+    alert('🛑 O campo MÁSCARA / RELATÓRIO TÉCNICO é obrigatório para CONCLUIR/ENVIAR RDO.');
+    document.getElementById('txtMas').focus();
+    return false;
+    }
+    if (carrinhoVazio) {
+    if (!confirm("⚠️ Atenção: O CARRINHO DE MATERIAIS está vazio. Deseja prosseguir mesmo assim?")) {
+    return false;
+    }
+    }
+    return true;
   }
   
   function concluirEmCampo() {
     if (!validarCamposObrigatorios()) return;
-      
+    
     const marcador = "STATUS: CONCLUIDA EM CAMPO em " + new Date().toLocaleDateString('pt-BR');
     document.getElementById('txtPen').value = marcador; 
     
@@ -909,68 +930,90 @@
   }
   
   function enviarRDO() {
-      // Validação estrita:
-      if (!validarCamposObrigatorios()) return;
+    // Validação estrita:
+    if (!validarCamposObrigatorios()) return;
 
-      if (UPLOADED_FILES.length === 0) {
-          if (!confirm("⚠️ O RDO será enviado SEM EVIDÊNCIAS (FOTOS). Deseja prosseguir com o envio?")) {
-              return;
-          }
+    if (UPLOADED_FILES.length === 0) {
+      if (!confirm("⚠️ O RDO será enviado SEM EVIDÊNCIAS (FOTOS). Deseja prosseguir com o envio?")) {
+        return;
+      }
+    }
+
+    const codObra = document.getElementById('hdnCod').value;
+    if (!codObra) {
+      alert("❌ Código da obra não encontrado.");
+      return;
+    }
+
+    // 1. UPLOAD DE FOTOS PARA O DRIVE
+    console.log("Iniciando processo de envio do RDO para a obra " + codObra);
+    uploadFilesToDrive(function(fileUrls) {
+      if (fileUrls === null) {
+        alert("❌ Falha crítica no upload das fotos. RDO não enviado.");
+        return;
       }
 
-      const codObra = document.getElementById('hdnCod').value;
-      
-      // 1. UPLOAD DE FOTOS PARA O DRIVE
-      uploadFilesToDrive(function(fileUrls) {
-          if (fileUrls === null) {
-              alert("❌ Falha crítica no upload das fotos. RDO não enviado.");
-              return;
-          }
-          
-          // 2. CHAMA O SALVAMENTO E GERAÇÃO DE PDF
-          const mascara = document.getElementById('txtMas').value;
-          const pendencia = document.getElementById('txtPen').value;
-          
-          let aplicacaoTexto = CARRINHO.map(item => {
-              return `[${item.tipo}] ${item.quantidade}x ${item.descricao} (${item.codigo})`;
-          }).join(' | ');
+      // 2. CHAMA O SALVAMENTO E GERAÇÃO DE PDF
+      const mascara = document.getElementById('txtMas').value;
+      const pendencia = document.getElementById('txtPen').value;
 
-          // Passa as URLs das fotos para o GAS para gerar o PDF
-          const urlsString = fileUrls.join(' | ');
-          
-          const btnEnviar = document.querySelector('.modal-content button[onclick="enviarRDO()"]');
-          const textoOriginal = btnEnviar ? btnEnviar.textContent : 'ENVIAR RDO';
-          if (btnEnviar) {
-              btnEnviar.textContent = '📄 Gerando PDF...';
-              btnEnviar.disabled = true;
-          }
+      let aplicacaoTexto = '';
+      if (CARRINHO.length > 0) {
+        aplicacaoTexto = CARRINHO.map(item => {
+          return `[${item.tipo}] ${item.quantidade}x ${item.descricao} (${item.codigo})`;
+        }).join(' | ');
+      }
 
-          // Chama a nova ação do GAS para SALVAR + GERAR PDF + ENVIAR
-          jsonp('gerar_rdo_e_enviar', {
-              codObra: codObra,
-              mascaraBa: mascara,
-              aplicacaoFeita: aplicacaoTexto,
-              pendencia: pendencia,
-              fileUrls: urlsString 
-          }, function(resposta) {
-              if (btnEnviar) {
-                  btnEnviar.textContent = textoOriginal;
-                  btnEnviar.disabled = false;
-              }
-              
-              if (resposta.sucesso) {
-                  alert(`✅ RDO enviado com sucesso! PDF gerado e notificado.`);
-                  closeModal();
-                  buscar();
-              } else {
-                  alert('❌ Erro no envio do RDO: ' + (resposta.mensagem || 'Falha desconhecida.'));
-              }
-          });
+      // Passa as URLs das fotos para o GAS para gerar o PDF
+      const urlsString = fileUrls.join(' | ');
+
+      const btnEnviar = document.querySelector('.modal-content button[onclick="enviarRDO()"]');
+      const textoOriginal = btnEnviar ? btnEnviar.textContent : 'ENVIAR RDO';
+      if (btnEnviar) {
+        btnEnviar.textContent = '📄 Gerando PDF...';
+        btnEnviar.disabled = true;
+      }
+
+      console.log("Enviando dados para geração do RDO:", {
+        codObra: codObra,
+        mascaraBa: mascara,
+        aplicacaoFeita: aplicacaoTexto,
+        pendencia: pendencia,
+        fileUrls: urlsString
       });
+
+      // Chama a nova ação do GAS para SALVAR + GERAR PDF + ENVIAR
+      jsonp('gerar_rdo_e_enviar', {
+        codObra: codObra,
+        mascaraBa: mascara,
+        aplicacaoFeita: aplicacaoTexto,
+        pendencia: pendencia,
+        fileUrls: urlsString
+      }, function(resposta) {
+        console.log("Resposta do envio do RDO:", resposta);
+        if (btnEnviar) {
+          btnEnviar.textContent = textoOriginal;
+          btnEnviar.disabled = false;
+        }
+
+        if (resposta && resposta.sucesso) {
+          alert(`✅ RDO enviado com sucesso! PDF gerado e notificado.`);
+          closeModal();
+          buscar();
+        } else {
+          const errorMsg = resposta && resposta.mensagem ? resposta.mensagem : 'Falha desconhecida.';
+          alert('❌ Erro no envio do RDO: ' + errorMsg);
+        }
+      });
+    });
   }
 
   function salvar() {
     const codObra = document.getElementById('hdnCod').value;
+    if (!codObra) {
+      alert("❌ Código da obra não encontrado.");
+      return;
+    }
     const mascara = document.getElementById('txtMas').value;
     const pendencia = document.getElementById('txtPen').value;
     
@@ -981,7 +1024,12 @@
       }).join(' | ');
     }
     
-    console.log('=== SALVANDO DADOS ===');
+    console.log('=== SALVANDO DADOS ===', {
+      codObra: codObra,
+      mascaraBa: mascara,
+      aplicacaoFeita: aplicacaoTexto,
+      pendencia: pendencia
+    });
     const btnSalvar = document.querySelector('.modal-content .primary');
     const textoOriginal = btnSalvar.textContent;
     btnSalvar.textContent = '💾 Salvando...';
@@ -996,19 +1044,22 @@
       btnSalvar.textContent = textoOriginal;
       btnSalvar.disabled = false;
       
-      if (resposta.sucesso) {
+      if (resposta && resposta.sucesso) {
         alert('✅ Dados salvos com sucesso!');
+        // Após salvar, dispara notificação
+        notificarAtualizacao(codObra, mascara, aplicacaoTexto, pendencia);
         closeModal();
         buscar();
       } else {
-        alert('❌ Erro: ' + (resposta.mensagem || 'Falha ao salvar'));
+        const errorMsg = resposta && resposta.mensagem ? resposta.mensagem : 'Falha ao salvar';
+        alert('❌ Erro: ' + errorMsg);
       }
     });
   }
   
-  // ============================================
+  // ====
   // FUNÇÃO JSONP PARA COMUNICAÇÃO
-  // ============================================
+  // ====
   function jsonp(acao, params, callback) {
     const nomeCallback = 'callback_' + Date.now() + '_' + Math.random().toString(36).substr(2);
     
@@ -1023,10 +1074,33 @@
     parametros.set('acao', acao);
     parametros.set('callback', nomeCallback);
     
+    const url = API + '?' + parametros.toString();
+    console.log("Chamando JSONP:", url, params);
+    
     const script = document.createElement('script');
-    script.src = API + '?' + parametros.toString();
+    script.src = url;
     script.id = nomeCallback; // Adiciona ID para remover depois
+    script.onerror = function() {
+      console.error("Erro ao carregar script JSONP:", url);
+      delete window[nomeCallback];
+      if(script && script.parentNode) script.parentNode.removeChild(script);
+      callback({ sucesso: false, mensagem: "Erro de conexão com o servidor." });
+    };
     document.body.appendChild(script);
+  }
+
+  // Nova função para notificar atualização (disparo assíncrono)
+  function notificarAtualizacao(codObra, mascara, aplicacao, pendencia) {
+    // Dispara notificação de forma assíncrona sem afetar o fluxo principal
+    console.log("Disparando notificação para obra " + codObra);
+    jsonp('notificar_atualizacao_obra', {
+      codObra: codObra,
+      mascaraBa: mascara,
+      aplicacaoFeita: aplicacao,
+      pendencia: pendencia
+    }, function(resposta) {
+      console.log("Notificação enviada:", resposta);
+    });
   }
 </script>
 </body>
